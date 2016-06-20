@@ -92,6 +92,7 @@ function lp_import_form_submit($form_id, &$form_state) {
   $related_fields = lp_import_export_get_related_fields();
   $product_related_models = $models = array();
 
+  $operations = array();
   foreach ($sheetData as $i => $row) {
     if ($i == 1) {
       continue;
@@ -99,193 +100,29 @@ function lp_import_form_submit($form_id, &$form_state) {
 
     $row = array_combine(array_keys($fields), $row);
 // From here ================================================================================
-  $err_vend = false;
-  $err_cat = false;
-  /*if((empty($row['vendor']) || !isset($vendors[$row['vendor']])) && ($row['type']!='Этикетки' && $row['type']!='Модификации' )){
-    $err_vend = true;
-  }*/
-  if((empty($row['field_category']) || !isset($categories[$row['field_category']])) &&  ($row['type']!='Модификации' && $row['type']!='Аксессуар')){
-    $err_cat = true;
-  }
-    $error = empty($row['model'])
-      || empty($row['type']) || !isset($types[$row['type']])
-      || $err_cat
-      || $err_vend;
-    if ($error) {
-      $ignored[] = "$i. {$row['model']}";
-     continue;
-    }
-
-    $product = db_select('uc_products', 'p')
-      ->fields('p')
-      ->condition('p.model', $row['model'])
-      ->execute()->fetch();
-
-    if (empty($product)) {
-      $node = new stdClass;
-      $node->shippable = false;
-      $node->language = 'ru';
-      $node->uid = $user->uid;
-      $node->type = $types[$row['type']];
-      $new = true;
-    } else {
-      $node = node_load($product->nid);
-      $new = false;
-    }
-
-    foreach ($row as $field => $value) {
-      if(!empty($value)){
-        switch ($fields[$field]['type']) {
-          case 'raw':
-            if ($field != 'type') $node->$field = $value;
-            break;
-          case 'text_textarea_with_summary':
-            $node->{$field}[LANGUAGE_NONE][0] = array(
-              'value' => $value,
-              'format' => 'full_html',
-              );
-          break;
-          case 'text_textfield':
-          case 'options_buttons':
-          case 'number':
-            $node->{$field}[LANGUAGE_NONE][0]['value'] = $value;
-          break;
-          case 'taxonomy_autocomplete' :
-          case 'term_reference_tree' :
-            switch ($field) {
-            case 'field_brand':
-              $node->field_brand[LANGUAGE_NONE][0]['tid'] = $vendors[$value];
-              break;
-            case 'field_category':
-              $node->field_category[LANGUAGE_NONE][0]['tid'] = $categories[$value];
-              break;
-            case 'field_tags':
-              $terms = preg_split('/\s*,\s*//*', $value);
-            $node->field_tags[LANGUAGE_NONE] = array();
-            foreach ($terms as $term_name) {
-              if (!isset($tags[$term_name])) {
-                $term = taxonomy_get_term_by_name($term_name, 'tags');
-                if (empty($term)) {
-                  $term = new stdClass;
-                  $term->vid = $tags_vocabulary->vid;
-                  $term->name = $term_name;
-                  taxonomy_term_save($term);
-                } else {
-                  $term = array_shift($term);
-                }
-                $tags[$term_name] = $term->tid;
-              }
-              $node->field_tags[LANGUAGE_NONE][] = array('tid' => $tags[$term_name]);
-            }
-              break;
-
-            default:
-              # code...
-              break;
-          }
-          break;
-          case 'image_image':
-            if (empty($node->uc_product_image)) {
-              $filepath = 'http://teploexpert.com' . $value;
-              $mime_raw = explode('.', $value);
-              $mime = array_pop($mime_raw);
-              $land = 'public://'. $node->model . '.' . $mime;
-              if (copy($filepath, $land)) {
-                $file = new stdClass;
-                $file->uid = $user->uid;
-                $file->uri = $land;
-                $file->filemime = $mime;
-                $file->status = 1;
-                file_save($file);
-
-                $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
-                break;
-              }
-          }
-            break;
-          default:
-            # code...
-            break;
-        }
-      }
-    }
-
-    if($node->type == 'mod') $node->status = 0;
-    node_save($node);
-    if($node->type == 'mod'){
-      $node = node_load($node->nid);
-    $option = new stdClass;
-      $option->aid = 1;
-      $option->name = $node->title;
-      $option->cost = $node->cost;
-      $option->price = $node->sell_price;
-     $opt_query = db_select('uc_product_as_attribute_option', 'u')
-     ->fields('u', array('oid'))
-     ->condition('u.nid', $node->nid)
-     ->execute()
-     ->fetchField();
-     if(!empty($opt_query)) $option->oid = $opt_query;
-      uc_attribute_option_save($option);
-      uc_product_as_attribute_option_save($option->oid, $node->nid);
-    }
-
-    if ($new) {
-      $created++;
-    } else {
-      $updated++;
-    }
-
-    /*foreach ($related_fields as $field) {
-      $row[$field] = trim($row[$field]);
-      if (!empty($row[$field])) {
-        $node_models = preg_split('/\s*,\s*//*', $row[$field], -1, PREG_SPLIT_NO_EMPTY);
-        if (empty($node_models)) {
-            continue;
-        }
-        $models = array_merge($models, $node_models);
-        $product_related_models[$node->nid][$field] = $node_models;
-      }
-    }*/
-  }
-
-  if(!empty($models)){$models = array_unique($models);
-  //$nids = array_unique($nids);
-  $result = db_select('uc_products', 'p')
-    ->fields('p', array('nid', 'model'))
-    ->condition('p.model', $models, 'IN')
-    ->execute()->fetchAll();
-  $nids = array();
-  foreach ($result as $row) {
-    $nids[$row->model] = $row->nid;
-  }
-  foreach ($product_related_models as $nid => $node_models) {
-    $node = node_load($nid);
-    foreach ($related_fields as $field) {
-      $values = array();
-	  if (isset($node_models[$field])) {
-		  foreach ($node_models[$field] as $model) {
-			if (isset($nids[$model])) {
-			  $values[] = array('nid' => $nids[$model]);
-			}
-		  }
-		  $node->{$field}[LANGUAGE_NONE] = $values;
-		}
-
-    }
-    node_save($node);
-  }
+    $operations[] = array('lp_import_export_process_import', array($row, $fields, $categories, $tags, $vendors, $types));
+  //To here
 }
+$batch = array (
+  // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'lp_import_export_process_import_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Импорт товаров',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Подготовка данных',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.'
+  );
+batch_set($batch);
 
-  drupal_set_message(t('@total products in file. @created products were created, @updated products were updated.', array(
-    '@total' => count($sheetData) - 1,
-    '@created' => $created,
-    '@updated' => $updated,
-  )));
-  if (!empty($ignored)) {
-    drupal_set_message(t('The following SKUs were ignored (row. model): !ignored', array(
-      '!ignored' => '<br />' . implode('<br />', $ignored),
-    )), 'error');
-  }
 }
 
 function lp_export_form_submit($form_id, &$form_state) {
@@ -474,10 +311,3 @@ function lp_import_export_get_related_fields() {
   return array('field_recommended', 'field_similar', 'field_accessories');
 }
 
-/**
- * Batch operation
- */
-
-function lp_import_export_process_import ($row, $fields, $context) {
-
-}
