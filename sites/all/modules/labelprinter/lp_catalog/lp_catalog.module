@@ -1,0 +1,855 @@
+<?php
+function lp_catalog_menu() {
+  $items = array();
+  $items['admin/config/catalog_settings'] = array(
+    'title' => t('Catalog settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_catalog_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'lp_catalog.admin.inc'
+  );
+  return $items;
+}
+
+function lp_catalog_taxonomy_term_insert($term) {
+  lp_catalog_update_aliases($term);
+}
+
+function lp_catalog_taxonomy_term_update($term) {
+  lp_catalog_update_aliases($term);
+}
+
+function lp_catalog_form_taxonomy_overview_terms_alter(&$form, &$form_state, $form_id) {
+  $form['#submit'][] = 'lp_catalog_taxonomy_overview_terms_submit';
+}
+
+function lp_catalog_taxonomy_overview_terms_submit($form, &$form_state) {
+  $vocabulary = $form['#vocabulary']->machine_name;
+  $terms = lp_misc_get_terms_by_vocabulary_name($vocabulary);
+  foreach ($form_state['values'] as $key => $term_data) {
+    if (preg_match('/^tid:\d+:\d+$/', $key)) {
+      $term = $terms[$term_data['tid']];
+      if ($term_data['parent'] == lp_catalog_get_term_parent_tid($term)) {
+        continue;
+      }
+      $term->vocabulary_machine_name = $vocabulary;
+      $term->parents = array($term_data['parent']);
+      lp_catalog_update_aliases($term);
+    }
+  }
+}
+
+function lp_catalog_update_aliases($term) {
+  if ($term->vocabulary_machine_name == 'catalog') {
+    lp_catalog_taxonomy_term_delete($term);
+    $alias = lp_catalog_get_term_alias($term);
+    lp_catalog_save_alias("catalog/all/{$term->tid}", $alias);
+    $vendors = lp_misc_get_terms_by_vocabulary_name('vendor', 0, 1);
+    foreach ($vendors as $vendor) {
+      lp_catalog_save_alias("catalog/{$vendor->tid}/{$term->tid}", $vendor->name . '/' . $alias);
+    }
+  } elseif ($term->vocabulary_machine_name == 'vendor') {
+    lp_catalog_taxonomy_term_delete($term);
+    if (lp_catalog_get_term_parent_tid($term)) {
+      lp_catalog_save_alias("catalog/{$term->tid}/all", lp_catalog_get_term_alias($term));
+    } else {
+      lp_catalog_save_alias("catalog/{$term->tid}/all", $term->name);
+      $categories = lp_misc_get_terms_by_vocabulary_name('catalog');
+      foreach ($categories as $category) {
+        lp_catalog_save_alias("catalog/{$term->tid}/{$category->tid}", $term->name . '/' . lp_catalog_get_term_alias($category));
+      }
+    }
+  }
+}
+
+function lp_catalog_taxonomy_term_delete($term) {
+  if ($term->vocabulary_machine_name == 'catalog') {
+    lp_catalog_delete_alias("catalog/all/{$term->tid}");
+    $vendors = lp_misc_get_terms_by_vocabulary_name('vendor');
+    foreach ($vendors as $vendor) {
+      lp_catalog_delete_alias("catalog/{$vendor->tid}/{$term->tid}");
+    }
+  } elseif ($term->vocabulary_machine_name == 'vendor') {
+    lp_catalog_delete_alias("catalog/{$term->tid}/all");
+    lp_catalog_delete_alias("catalog/{$term->tid}/all");
+    $categories = lp_misc_get_terms_by_vocabulary_name('catalog');
+    foreach ($categories as $category) {
+      lp_catalog_delete_alias("catalog/{$term->tid}/{$category->tid}");
+    }
+  }
+}
+
+function lp_catalog_save_alias($source, $alias) {
+  module_load_include('inc', 'pathauto');
+
+  $alias = pathauto_cleanstring($alias);
+  
+  $values = explode("\n", trim(variable_get('lp_catalog_alias_replacement')));
+  $replacements = array();
+  foreach ($values as $value) {
+    $value = preg_split('/\s*\|\s*/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+    if (count($value) == 2) {
+      $replacements[$value[0]] = trim($value[1], '/');
+    }
+  }
+  if (isset($replacements[$alias])) {
+    $alias = $replacements[$alias];
+  }
+
+  $path = path_load(array('source' => $source));
+  if ($path) {
+    if ($path['alias'] == $alias) {
+      return;
+    } else {
+      $path['alias'] = $alias;
+    }
+  } else {
+    $path = array(
+      'source' => $source,
+      'alias' => $alias,
+    );
+  }
+  path_save($path);
+}
+
+function lp_catalog_delete_alias($source) {
+  $path = path_load(array('source' => $source));
+  if ($path) {
+    path_delete($path['pid']);
+  }  
+}
+
+function lp_catalog_get_term_alias($term) {
+  return trim(token_replace('[term:parent]/[term:name]', array('term' => $term), array('clear' => true)), '/');
+}
+
+function lp_catalog_block_info() {
+  $blocks['vendor_menu'] = array(
+    'info' => t('Vendor menu'),
+  );
+  $blocks['catalog_menu'] = array(
+    'info' => t('Catalog menu'),
+  );
+  $blocks['catalog_links'] = array(
+    'info' => t('Catalog links'),
+  );
+  return $blocks;
+}
+
+function lp_catalog_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'vendor_menu':
+      $block['subject'] = '';
+      $block['content'] = theme('lp_catalog_menu', array('menu' => lp_catalog_get_vendor_menu()));
+    break;
+    case 'catalog_menu':
+      $block['subject'] = '';
+      $block['content'] = theme('lp_catalog_menu', array('menu' => lp_catalog_get_catalog_menu()));
+    break;
+    case 'catalog_links':
+      $block['subject'] = '';
+      $block['content'] = lp_catalog_get_links();
+    break;
+  }
+  return $block;
+}
+
+function lp_catalog_get_vendor_menu() {
+  $categories = lp_misc_get_terms_by_vocabulary_name('catalog');
+  $vendors = lp_misc_get_terms_by_vocabulary_name('vendor');
+  $relations = lp_catalog_get_catalog_relations(true);
+
+  $menu = array();
+
+  foreach ($vendors as $vendor) {
+    if (!lp_catalog_get_term_parent_tid($vendor)) {
+      $menu[$vendor->tid] = array(
+        'title' => $vendor->name,
+        'href' => "catalog/{$vendor->tid}/all",
+        'below' => array(),
+      );
+    }
+  }
+
+  foreach ($relations as $vendor_tid => $category_tids) {
+    foreach ($category_tids as $category_tid => $count) {
+      if (!isset($vendors[$vendor_tid])) {
+        continue;
+      }
+      if ($parent_tid = lp_catalog_get_term_parent_tid($vendors[$vendor_tid])) {
+        $vendor_tid = $parent_tid;
+      }
+      $category = $categories[$category_tid];
+      $item = array(
+        'title' => $category->name . ' ' . $vendors[$vendor_tid]->name,
+        'href' => "catalog/{$vendor_tid}/{$category_tid}",
+        'below' => array(),
+      );
+      if ($parent_tid = lp_catalog_get_term_parent_tid($category)) {
+        if (!isset($menu[$vendor_tid]['below'][$parent_tid])) {
+          $parent = $categories[$parent_tid];
+          $menu[$vendor_tid]['below'][$parent_tid] = array(
+            'title' => $parent->name . ' ' . $vendors[$vendor_tid]->name,
+            'href' => "catalog/{$vendor_tid}/{$parent_tid}",
+            'below' => array(),
+          );
+        }
+        $menu[$vendor_tid]['below'][$parent_tid]['below'][$category->tid] = $item;
+      } else {
+        $menu[$vendor_tid]['below'][$category->tid] = $item;
+      }
+    }
+  }
+
+  foreach ($menu as $key => $item) {
+    if (empty($item['below'])) {
+      unset($menu[$key]);
+    }
+  }
+
+  return $menu;
+}
+
+function lp_catalog_get_catalog_menu() {
+  $categories = lp_misc_get_terms_by_vocabulary_name('catalog');
+  $relations = lp_catalog_get_catalog_relations();
+
+  $menu = array();
+  foreach ($relations as $category_tid => $count) {
+    $category = $categories[$category_tid];
+    $item = array(
+      'title' => $category->name,
+      'href' => "catalog/all/{$category_tid}",
+      'below' => array(),
+      'weight' => $category->weight,
+    );
+    if ($parent_tid = lp_catalog_get_term_parent_tid($category)) {
+      if (!isset($menu[$parent_tid])) {
+        $parent = $categories[$parent_tid];
+        $menu[$parent_tid] = array(
+          'title' => $parent->name,
+          'href' => "catalog/all/{$parent_tid}",
+          'below' => array(),
+          'weight' => $parent->weight,
+        );
+      }
+      $menu[$parent_tid]['below'][$category->tid] = $item;
+    } else {
+      $menu[$category->tid] = $item;
+    }
+  }
+
+  usort($menu, 'lp_catalog_sort_menu');
+
+  return $menu;
+}
+
+function lp_catalog_sort_menu($a, $b) {
+  if ($a['weight'] == $b['weight']) {
+    return 0;
+  }
+  return ($a['weight'] < $b['weight']) ? -1 : 1;
+}
+
+function lp_catalog_theme() {
+  $items['lp_catalog_menu'] = array(
+    'variables' => array('menu' => array()),
+  );
+  $items['lp_catalog_menu_item'] = array(
+    'variables' => array('menu_item' => array()),
+  );
+  $items['lp_catalog_links'] = array(
+    'variables' => array('menu' => array()),
+  );
+  $items['lp_catalog_series'] = array(
+    'variables' => array('series' => array()),
+  );
+  $items['lp_catalog_tags'] = array(
+    'variables' => array('tags' => array()),
+  );
+  $items['lp_catalog_category_vendors'] = array(
+    'variables' => array('vendors' => array(), 'category_tid' => null),
+  );
+  $items['lp_catalog_vendor'] = array(
+    'variables' => array(
+      'menu' => array(), 
+      'series' => array(), 
+      'term' => array(), 
+      'terms_description' => array(),
+    ),
+    'template' => 'templates/lp_catalog_vendor',
+  );
+  return $items;
+}
+
+function theme_lp_catalog_menu($vars) {
+  $menu = $vars['menu'];
+  if (empty($menu)) {
+    return '';
+  }
+  $output = '<ul>';
+  foreach ($menu as $menu_item) {
+	if(!empty($menu_item['below'])){
+		$output .= '<li class="below">';
+	} else{  
+    $output .= '<li>';}
+    $output .= theme('lp_catalog_menu_item', array('menu_item' => $menu_item));
+    if (!empty($menu_item['below'])) {
+      $output .= theme('lp_catalog_menu', array('menu' => $menu_item['below']));
+    }
+    $output .= '</li>';
+  }
+  $output .= '</ul>';
+  return $output;
+}
+
+function theme_lp_catalog_menu_item($vars) {
+  $path = request_path();
+  $item = $vars['menu_item'];
+  $url = url($item['href']);
+  $class = strpos('/' . $path, $url) === 0 ? ' class="active"' : '';
+  return '<a href="' . $url . '" ' . $class . '>' . $item['title'] . '</a>';
+}
+
+function theme_lp_catalog_links($vars) {
+  if (empty($vars['menu'])) {
+    return '';
+  }
+  $output = '<div class="vendor-sections">';
+  foreach ($vars['menu'] as $item) {
+    $output .= '<div class="vendor-section">';
+    $output .= '<div class="h4">' . l($item['title'], $item['href']) . '</div>';
+    if (!empty($item['below'])) {
+      $output .= '<ul>';
+      foreach ($item['below'] as $tid => $item) {
+        $output .= '<li>';
+        $output .= l($item['title'], $item['href']);
+        if (isset($vars['terms_description'][$tid]) && !empty($vars['terms_description'][$tid])) {
+          $output .= '<p>' . $vars['terms_description'][$tid] . '</p>';
+        }
+        $output .= '</li>';
+      }
+      $output .= '</ul>';
+    }
+    $output .= '</div>';
+  }
+  $output .= '<div class="clear"></div>';
+  $output .= '</div>';
+  return $output;
+}
+
+function theme_lp_catalog_series($vars) {
+  $output = '';
+  if (!empty($vars['series'])) {
+    $output .= '<div class="tags">';
+    $output .= '<div class="h3">' . t('Series') . '</div>';
+    foreach ($vars['series'] as $item) {
+      $output .= l($item->name, 'catalog/' . $item->tid . '/all');
+    }
+    $output .= '</div>';
+  }
+  return $output;
+}
+
+function theme_lp_catalog_tags($vars) {
+  $output = '';
+  if (!empty($vars['tags'])) {
+    $output .= '<div class="tags">';
+    foreach ($vars['tags'] as $tid => $name) {
+		if(isset($name) && $name !=''){
+		$output .= l($name, 'taxonomy/term/' . $tid);}
+    }
+    $output .= '</div>';
+  }
+  return $output;
+}
+
+function theme_lp_catalog_category_vendors($vars) {
+  $output = '';
+  if (!empty($vars['vendors'])) {
+    $output .= '<div class="tags">';
+    $output .= '<div class="h3">' . t('Vendors') . '</div>';
+    foreach ($vars['vendors'] as $term) {
+      $output .= l($term->name, 'catalog/' . $term->tid . '/' . $vars['category_tid']);
+    }
+    $output .= '</div>';
+  }
+  return $output;
+}
+
+function lp_catalog_products_exist($vendor_tid, $category_tid = null) {
+  $query = search_api_query('product_index');
+  $query_filter = $query->createFilter();
+  $query_filter->condition('field_vendor', $vendor_tid);
+  if (!empty($category_tid)) {
+    $query_filter->condition('taxonomy_catalog', $category_tid);
+  }
+  $query->filter($query_filter);
+  $result = $query->execute();
+  return $result['result count'] != 0;
+}
+
+function lp_catalog_get_catalog_relations($vendor = false, $catalog = true, $tag = false) {
+  $query = db_select('node', 'n');
+  $query->addExpression('COUNT(*)', 'count');
+  $query->condition('n.status', 1);
+  if ($catalog) {
+    $query->fields('c', array('taxonomy_catalog_tid'));
+    $query->leftJoin('field_data_taxonomy_catalog', 'c', 'c.entity_id = n.nid');
+    $query->isNotNull('c.taxonomy_catalog_tid');
+    $query->groupBy('c.taxonomy_catalog_tid');
+  }
+  if ($vendor) {
+    $query->fields('v', array('field_vendor_tid'));
+    $query->leftJoin('field_data_field_vendor', 'v', 'v.entity_id = n.nid');
+    $query->isNotNull('v.field_vendor_tid');
+    $query->groupBy('v.field_vendor_tid');
+  }
+  if ($tag) {
+    $query->fields('t', array('field_tags_tid'));
+    $query->fields('a', array('name'));
+    $query->leftJoin('field_data_field_tags', 't', 't.entity_id = n.nid');
+    $query->isNotNull('t.field_tags_tid');
+    $query->isNotNull('a.name');
+    $query->condition('t.entity_type', 'node');
+    $query->groupBy('t.field_tags_tid');  
+    $query->leftJoin('taxonomy_term_data', 'a', 'a.tid = t.field_tags_tid');
+  }
+  $result = $query->execute()->fetchAll();
+  $relations = array();
+  if ($vendor && $catalog && !$tag) {
+    foreach ($result as $row) {
+      $relations[$row->field_vendor_tid][$row->taxonomy_catalog_tid] = $row->count;
+    }
+  } elseif (!$vendor && $catalog && !$tag) {
+    foreach ($result as $row) {
+      $relations[$row->taxonomy_catalog_tid] = $row->count;
+    }
+  } elseif ($vendor && !$catalog && $tag) {
+    foreach ($result as $row) {
+      $relations[$row->field_vendor_tid][$row->field_tags_tid] = $row->name;
+    }
+  } elseif ($vendor && $catalog && $tag) {
+    foreach ($result as $row) {
+      $relations[$row->field_vendor_tid][$row->taxonomy_catalog_tid][$row->field_tags_tid] = $row->name;
+    }
+  } elseif ($vendor && !$catalog && !$tag) {
+    foreach ($result as $row) {
+      $relations[$row->field_vendor_tid] = $row->count;
+    }
+  } elseif (!$vendor && $catalog && $tag) {
+    foreach ($result as $row) {
+      $relations[$row->taxonomy_catalog_tid][$row->field_tags_tid] = $row->name;
+    }
+  } else {
+    $relations = $result;
+  }
+  return $relations;
+}
+
+function lp_catalog_get_term_parent_tid($term) {
+  if (isset($term->parents)) {
+    $parents = $term->parents;
+  } else {
+    $parents = $term->parent;
+  }
+  return array_shift($parents);
+}
+
+function lp_catalog_get_links() {
+  $output = '';
+  if (arg(0) == 'catalog') {	  
+    $vendor_tid = arg(1);
+    $category_tid = arg(2);
+	$urrl = request_path();			
+	$vend = taxonomy_term_load($vendor_tid);	
+	if($vend && !empty($vend->field_image)){$logo = $vend->field_image['und'][0];
+	$logo['path'] = $logo['uri'];}	
+    if ($vendor_tid != 'all' && $category_tid != 'all') {
+      $menu = lp_catalog_get_vendor_menu();
+      if (isset($menu[$vendor_tid]['below'][$category_tid])) {
+      //  $output .= theme('lp_catalog_links', array('menu' => $menu[$vendor_tid]['below'][$category_tid]['below']));
+      }
+
+      $series = lp_misc_get_terms_by_vocabulary_name('vendor', $vendor_tid);
+      $relations = lp_catalog_get_catalog_relations(true, true, true);
+      $tags = isset($relations[$vendor_tid][$category_tid]) ? $relations[$vendor_tid][$category_tid] : array();
+      if (!empty($categories)) {
+        foreach ($categories as $category) {
+          if (isset($relations[$vendor_tid][$category->tid])) {
+            $tags += $relations[$vendor_tid][$category->tid];
+          }
+        }
+      }
+      if (empty($categories)) {
+        foreach ($series as $serie) {
+          if (isset($relations[$serie->tid][$category_tid])) {
+            $tags += $relations[$serie->tid][$category_tid];
+          }
+        }
+      } else {
+        foreach ($series as $serie) {
+          foreach ($categories as $category) {
+            if (isset($relations[$serie->tid][$category->tid])) {
+              $tags += $relations[$serie->tid][$category->tid];
+            }
+          }
+        }
+      }      
+
+      $relations = lp_catalog_get_catalog_relations(true, true, false);
+      $categories = lp_misc_get_terms_by_vocabulary_name('catalog', $category_tid);
+      $terms = array();
+      if (empty($categories)) {
+        foreach ($series as $serie) {
+          if (isset($relations[$serie->tid][$category_tid])) {
+            $terms[] = $serie;
+          }
+        }
+      } else {
+        foreach ($series as $serie) {
+          foreach ($categories as $category) {
+            if (isset($relations[$serie->tid][$category->tid])) {
+              $terms[] = $serie;
+              break;
+            }
+          }
+        }
+      }
+      //$output .= theme('lp_catalog_series', array('series' => $terms));
+	  $terms_description = array();
+       /* if (isset($menu[$term->tid])) {        
+          foreach ($menu[$term->tid]['below'] as $items) {
+            foreach ($items['below'] as $tid => $subitems) {
+              $category = taxonomy_term_load($tid);
+              if (isset($category->field_teaser[LANGUAGE_NONE][0]['value'])) {
+                $terms_description[$tid] = $category->field_teaser[LANGUAGE_NONE][0]['value'];
+              } 
+            }
+          }
+        }*/
+		$body='';
+	$block_query = db_select('block','b');
+	$block_query -> innerJoin('block_custom', 'bc', 'b.delta = bc.bid');
+	$block_query -> fields('bc', array('body'));	
+	$block_query -> condition('b.pages', $urrl);
+	$block_query -> condition('b.theme', 'mtech');
+	$bl = $block_query->execute()->fetchAll();
+	if(!empty($bl)){$body = $bl[0]->body;}
+		if($body != ''){
+			$vend->description = $body;
+		}
+	  $output .= theme('lp_catalog_vendor', array(
+          'term' => taxonomy_term_view($vend),
+          'menu' => isset($menu[$vendor_tid]['below'][$category_tid]['below']) ? $menu[$vendor_tid]['below'][$category_tid]['below'] : array(),
+          'series' => $terms,
+          'terms_description' => $terms_description,
+		  'tags'	=> $tags,
+        ));
+    } elseif ($category_tid != 'all') {
+      $relations = lp_catalog_get_catalog_relations(false, true, false);
+      $term = taxonomy_term_view(taxonomy_term_load($category_tid));
+	 // echo print_r($term);
+      //$output .= render($term);
+	  $relations = lp_catalog_get_catalog_relations(false, true, true);
+      $tags = isset($relations[$category_tid]) ? $relations[$category_tid] : array();
+      if(isset($categories)){
+		  foreach ($categories as $category) {
+        if (isset($relations[$category->tid])) {
+          $tags += $relations[$category->tid];
+        }
+      }
+	  }
+	  //
+	  $categories = lp_misc_get_terms_by_vocabulary_name('catalog', $category_tid);
+      foreach ($categories as $tid => $category) {
+        if (!isset($relations[$tid])) {
+          unset($categories[$tid]);
+        }
+      }
+      if (!empty($categories)) {
+		  foreach ($categories as $category) {
+        if (isset($relations[$category->tid])) {
+          $tags += $relations[$category->tid];
+        }
+      }
+	  }
+	  //
+	   $output .= theme('lp_catalog_vendor', array(
+          'term' => $term,
+          'menu' => isset($terms)?(isset($menu[$term->tid]) ? $menu[$term->tid]['below'] : isset($menu[$vendor_tid]['below'][$category_tid]['below']) ? $menu[$vendor_tid]['below'][$category_tid]['below'] : array()): array(),
+          'series' => isset($terms)? $terms : array(),
+          'terms_description' => isset($terms_description) ? $terms_description : '',
+		  'tags'	=> $tags,
+        ));
+     /* $categories = lp_misc_get_terms_by_vocabulary_name('catalog', $category_tid);
+      foreach ($categories as $tid => $category) {
+        if (!isset($relations[$tid])) {
+          unset($categories[$tid]);
+        }
+      }
+      if (!empty($categories)) {
+        $output .= '<div class="categories">';
+        foreach ($categories as $category) {
+          $term = taxonomy_term_view(taxonomy_term_load($category->tid), 'teaser');
+          $output .= render($term);
+        }
+        $output .= '<div class="clear"></div>';
+        $output .= '</div>';
+      }
+
+     /* $relations = lp_catalog_get_catalog_relations(false, true, true);
+      $tags = isset($relations[$category_tid]) ? $relations[$category_tid] : array();
+      foreach ($categories as $category) {
+        if (isset($relations[$category->tid])) {
+          $tags += $relations[$category->tid];
+        }
+      }*/
+      //$output .= theme('lp_catalog_tags', array('tags' => $tags));
+
+      $related_vendors = array();
+      $parents = taxonomy_get_parents($category_tid);
+      $category_tids = array_keys($categories);
+      array_push($category_tids, $category_tid);
+      $vendors = lp_misc_get_terms_by_vocabulary_name('vendor');
+      $relations = lp_catalog_get_catalog_relations(true);
+      foreach ($vendors as $vendor_tid => $vendor) {
+        if (isset($relations[$vendor_tid])) {
+          $intersection = array_intersect($category_tids, array_keys($relations[$vendor_tid]));
+          if (!empty($intersection)) {
+            $parent = array_shift($vendor->parents);
+            if (empty($parent)) {
+              $related_vendors[$vendor_tid] = $vendor;
+            } elseif (!isset($related_vendors[$parent])) {
+              $related_vendors[$parent] = $vendors[$parent];
+            }
+          }
+        }
+      }
+      
+      $output .= theme('lp_catalog_category_vendors', array('vendors' => $related_vendors, 'category_tid' => $category_tid));
+    } elseif ($vendor_tid != 'all') {
+      $parents = taxonomy_get_parents($vendor_tid);
+      if (empty($parents)) {
+        $term = taxonomy_term_load($vendor_tid);
+        $series = lp_misc_get_terms_by_vocabulary_name('vendor', $vendor_tid);
+        $menu = lp_catalog_get_vendor_menu();
+
+        $relations = lp_catalog_get_catalog_relations(true, false, false);
+        $terms = array();
+        foreach ($series as $serie) {
+          if (isset($relations[$serie->tid])) {
+            $terms[] = $serie;
+          }
+        }
+
+        $terms_description = array();
+        if (isset($menu[$term->tid])) {        
+          foreach ($menu[$term->tid]['below'] as $items) {
+            foreach ($items['below'] as $tid => $subitems) {
+              $category = taxonomy_term_load($tid);
+              if (isset($category->field_teaser[LANGUAGE_NONE][0]['value'])) {
+                $terms_description[$tid] = $category->field_teaser[LANGUAGE_NONE][0]['value'];
+              } 
+            }
+          }
+        }
+
+        $output .= theme('lp_catalog_vendor', array(
+          'term' => taxonomy_term_view($term),
+          'menu' => isset($menu[$term->tid]) ? $menu[$term->tid]['below'] : array(),
+          'series' => $terms,
+          'terms_description' => $terms_description,
+        ));
+      } else {
+		  $term = taxonomy_term_load($vendor_tid);
+		  $parents = taxonomy_get_parents($vendor_tid);
+		  if(!empty($parents) && empty($term->field_image)){
+			  $parent = array_shift($parents);
+			$term->field_image = $parent->field_image;
+		  }		 
+		  $output .= theme('lp_catalog_vendor', array(
+          'term' => taxonomy_term_view($term),          
+        ));
+	  }
+    }
+  }
+
+  return $output;
+}
+
+function lp_catalog_form_views_exposed_form_alter(&$form, &$form_state, $form_id) { 
+  //if ($form['#id'] == 'views-exposed-form-catalog-page' || $form['#id'] == 'views-exposed-form-catalog-page-1') {
+  if (strpos($form['#id'], 'views-exposed-form-catalog-page-')!== false) {
+    $path = current_path();
+
+    $items_per_page_list = array();
+    foreach ($form['items_per_page']['#options'] as $key => $value) {
+      $items_per_page_list[] = array(
+        'title' => $value,
+        'params' => array('items_per_page' => $key),
+      );
+    }
+    if (empty($items_per_page_list)) {
+      return;
+    }
+
+    $values = lp_catalog_get_default_sorting_values();
+
+    $sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : $values['sort_by'];
+    $sort_order = isset($_GET['sort_order']) ? $_GET['sort_order'] : $values['sort_order'];
+    $items_per_page = isset($_GET['items_per_page']) ? $_GET['items_per_page'] : $values['items_per_page'];
+
+    $list = array(
+      array(
+        'title' => t('From cheap to expensive'),
+        'params' => array('sort_by' => 'sell_price', 'sort_order' => 'ASC'),
+      ),
+      array(
+        'title' => t('From expensive to cheap'),
+        'params' => array('sort_by' => 'sell_price', 'sort_order' => 'DESC'),
+      ),
+      array(
+        'title' => t('Title ascending'),
+        'params' => array('sort_by' => 'title', 'sort_order' => 'ASC'),
+      ),
+      array(
+        'title' => t('Title descending'),
+        'params' => array('sort_by' => 'title', 'sort_order' => 'DESC'),
+      ),
+    );
+
+    $markup = '<ul>';
+    foreach ($list as $key => $item) {
+      $item['params']['items_per_page'] = $items_per_page;
+      $options = array('query' => $item['params']);
+      if ($item['params']['sort_by'] == $sort_by && $item['params']['sort_order'] == $sort_order) {
+        $active = $key;
+      }
+      $markup .= '<li>' . l($item['title'], $path, $options) . '</li>';
+    }
+    $markup .= '</ul>';
+    $order = '<label>' . t('Sorting: ') . '</label><div class="list"><span>' . $list[$active]['title'] . '</span>' . $markup . '</div>';
+
+    $markup = '<ul>';
+    foreach ($items_per_page_list as $key => $item) {
+      $item['params']['sort_by'] = $sort_by;
+      $item['params']['sort_order'] = $sort_order;
+      $options = array('query' => $item['params']);
+      if ($item['params']['items_per_page'] == $items_per_page) {
+        $active = $key;
+        $markup .= '<li>' . $item['title'] . '</li>';
+      } else
+      $markup .= '<li>' . l($item['title'], $path, $options) . '</li>';
+    }
+    $markup .= '</ul>';
+    $per_page = '<label>' . t('Items per page: ') . '</label><div class="list">' . $markup . '</div>';
+
+    $form['order_list'] = array('#markup' => '<div class="list-sort">' . $order . '</div><div class="list-per">' . $per_page . '</div>');
+  }
+}
+
+function lp_catalog_get_default_sorting_values() {
+  return array(
+    'sort_by' => 'sell_price',
+    'sort_order' => 'ASC',
+    'items_per_page' => 20,
+  );
+}
+
+function lp_catalog_preprocess_page(&$vars) {
+  if (arg(0) == 'catalog') {
+    $links = array(l(t('Home'), null));
+    $title = drupal_get_title();
+    $vendor_tid = arg(1);
+    $category_tid = arg(2);
+
+    if ($vendor_tid != 'all' && $category_tid == 'all') {
+      $vendor = taxonomy_term_load($vendor_tid);
+      if (empty($vendor)) {
+        return;
+      }
+      $parents = taxonomy_get_parents($vendor_tid);
+      if (!empty($parents)) {
+        $parent = array_shift($parents);
+        $links[] = l($parent->name, 'catalog/' . $parent->tid . '/all');
+      }
+      $title = (isset($parent) ? $parent->name . ' ' : '') . $vendor->name;
+    } elseif ($vendor_tid != 'all' || $category_tid != 'all') {
+      if ($vendor_tid != 'all') {
+        $vendor = taxonomy_term_load($vendor_tid);
+        if (empty($vendor)) {
+          return;
+        }
+        $links[] = l($vendor->name, 'catalog/' . $vendor->tid . '/all');
+      }
+      $category = taxonomy_term_load($category_tid);
+      $parents = taxonomy_get_parents($category_tid);
+      if (!empty($parents)) {
+        $parent = array_shift($parents);
+        $links[] = l($parent->name . (isset($vendor) ? ' ' . $vendor->name : ''), 'catalog/' . $vendor_tid . '/' . $parent->tid);
+      }
+      $title = $category->name . (isset($vendor) ? ' ' . $vendor->name : '');
+    }
+
+    drupal_set_breadcrumb($links);
+    drupal_set_title($title);
+    return;
+  }
+
+  if (isset($vars['node'])) {
+    $items = field_get_items('node', $vars['node'], 'taxonomy_catalog'); 
+    $links = array(l(t('Home'), null));
+    if (!empty($items)) {
+      $term = taxonomy_term_load($items[0]['tid']);
+      $parents = taxonomy_get_parents($items[0]['tid']);
+      if (!empty($parents)) {
+        $parent = array_shift($parents);
+        $links[] = l($parent->name, 'catalog/all/' . $parent->tid);
+      }
+      $links[] = l($term->name, 'catalog/all/' . $term->tid);
+      drupal_set_breadcrumb($links);
+    }   
+  }
+}
+
+function lp_catalog_views_pre_render(&$view) {
+  if ($view->name == 'catalog' && $view->current_display == 'page') {
+    $vendor_tid = $view->args[0];
+    $category_tid = $view->args[1];
+
+    if ($vendor_tid != 'all' && $category_tid == 'all') {
+      $vendor = taxonomy_term_load($vendor_tid);
+      $parents = taxonomy_get_parents($vendor_tid);
+      if (!empty($parents)) {
+        $parent = array_shift($parents);
+      }
+      $title = (isset($parent) ? $parent->name . ' ' : '') . $vendor->name;
+      $view->set_title($title);
+    } elseif ($vendor_tid != 'all' && $category_tid != 'all') {
+      $vendor = taxonomy_term_load($vendor_tid);
+      $category = taxonomy_term_load($category_tid);
+      $parents = taxonomy_get_parents($category_tid);
+      if (!empty($parents)) {
+        $parent = array_shift($parents);
+      }
+	 
+      $title = $category->name . (isset($vendor) ? ' ' . $vendor->name : '');     
+	 $view->set_title($title);
+	  
+    }
+  }
+}
+
+function lp_catalog_html_head_alter(&$head_elements) {
+  if (isset($head_elements['metatag_canonical'])) {
+    $path = current_path();
+    if (preg_match('/^catalog\/(\d+|all)\/(\d+|all)$/', $path)) {
+      $values = lp_catalog_get_default_sorting_values();
+      $values['items_per_page'] = 'All';
+      $head_elements['metatag_canonical']['#value'] .= '?' . drupal_http_build_query($values);
+    }
+  }
+}

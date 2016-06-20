@@ -1,0 +1,40 @@
+<?php
+function lp_pathauto_token_info() {
+  $info['tokens']['node']['catalog'] = array(
+    'name' => t('Catalog'),
+    'description' => t('If catalog is set section and category are added to path.'),
+  );
+  return $info;
+}
+
+function lp_pathauto_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+  if ($type == 'node' && !empty($data['node'])) {
+    $node = $data['node'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'catalog':
+          if (in_array($node->type, uc_product_types())) {
+            $replacements[$original] = _create_catalog_path($node);
+          }
+          break;
+      }
+    }
+  }
+  return $replacements;
+}
+
+function _create_catalog_path($node) {
+  if (empty($node->taxonomy_catalog[LANGUAGE_NONE])) {
+    return '';
+  } 
+  $category = taxonomy_term_load($node->taxonomy_catalog[LANGUAGE_NONE][0]['tid']);
+  $path = pathauto_cleanstring($category->name);
+  $parents = taxonomy_get_parents($category->tid);
+  $parent = array_shift($parents);
+  if (!empty($parent)) {
+    $path = pathauto_cleanstring($parent->name) . '/' . $path;
+  }
+  return $path;
+}

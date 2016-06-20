@@ -1,0 +1,66 @@
+<?php
+function lp_misc_init() {
+  $url = parse_url(request_uri());
+  if (preg_match('/^\/(.+)\/$/', $url['path'], $match)) {
+    drupal_goto($match[1], array('query' => drupal_get_query_parameters()), 301);
+  }
+
+  $redirects = variable_get('redirects');
+  if (empty($redirects)) {
+    return;
+  }
+  $url = $_GET['q'];
+  if (isset($redirects[$url])) {
+    drupal_goto($redirects[$url], array(), 301);
+  }
+}
+
+function lp_misc_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'uc_store_settings_form') {
+    $form['basic']['uc_store_schedule'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Schedule'),
+      '#default_value' => variable_get('uc_store_schedule', ''),
+    );
+    $form['basic']['uc_store_display_email'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Display email'),
+      '#default_value' => variable_get('uc_store_display_email', ''),
+    );
+    $form['basic']['uc_store_display_cart'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display cart'),
+      '#default_value' => variable_get('uc_store_display_cart', true),
+    );
+    $form['#submit'][] = 'lp_misc_store_settings_form_submit';
+  }
+}
+
+function lp_misc_store_settings_form_submit($form, &$form_state) {
+  variable_set('uc_store_schedule', $form_state['values']['uc_store_schedule']);
+  variable_set('uc_store_display_email', $form_state['values']['uc_store_display_email']);
+}
+
+function lp_misc_get_terms_by_vocabulary_name($name, $parent = 0, $max_depth = NULL) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load($name);
+  $tree = taxonomy_get_tree($vocabulary->vid, $parent, $max_depth);
+  $terms = array();
+  foreach ($tree as $term) {
+    $terms[$term->tid] = $term;
+  }
+  return $terms;
+}
+
+function lp_product_image($node, $style) {
+  if (empty($field)) {
+    $img = '<img src="/' . path_to_theme() . '/images/no-image-' . $style . '.jpg" />';
+  } else {
+    $img = theme_image_style(array(
+      'style_name' => $style,
+      'path' => $node->field_image[LANGUAGE_NONE][0]['uri'],
+      'width' => null,
+      'height' => null,
+    ));
+  }
+  return '<div class="product-picture">' . l($img, 'node/' . $node->nid, array('html' => true)) . '</div>';
+}

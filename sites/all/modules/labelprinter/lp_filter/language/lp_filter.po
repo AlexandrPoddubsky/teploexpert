@@ -1,0 +1,15 @@
+#: lp_filter.module:184
+msgid "To @to"
+msgstr "До @to"
+
+#: lp_filter.module:186
+msgid "More than @from"
+msgstr "Более @from"
+
+#: lp_filter.module:188
+msgid "From @from to @to"
+msgstr "От @from до @to"
+
+#: lp_filter.module:106
+msgid "Use this filter"
+msgstr "Использовать фильтр"

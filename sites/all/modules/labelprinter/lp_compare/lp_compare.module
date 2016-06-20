@@ -1,0 +1,170 @@
+<?php
+define('LP_COMPARISON_LIMIT', 4);
+
+function lp_compare_menu() {
+  $items = array();
+  $items['compare/%'] = array(
+    'title' => t('Product comparison'),
+    'page callback' => 'lp_compare_list',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  );  
+  $items['compare/manage/%/%'] = array(
+    'page callback' => 'lp_compare_manage',
+    'page arguments' => array(2, 3),
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function lp_compare_theme() {
+  $items['lp_compare'] = array(
+    'variables' => array('nid' => null, 'tid' => null),
+    'template' => 'templates/lp_compare',
+  );
+  return $items;
+}
+
+function lp_compare_manage($tid, $nid) {
+  $result = array('error' => null);
+
+  $nids = lp_get_comparison_list($tid);
+  if (($key = array_search($nid, $nids)) === false) {
+    if (count($nids) == LP_COMPARISON_LIMIT) {
+      $result['error'] = t('You can compare @n products or less.', array('@n' => LP_COMPARISON_LIMIT));
+    } else {
+      $nids[] = $nid;
+    }   
+  } else {
+    unset($nids[$key]);
+  }
+  lp_set_comparison_list($tid, $nids);
+
+  $result['html'] = theme('lp_compare', array('nid' => $nid, 'tid' => $tid));
+  drupal_json_output($result);
+}
+
+function lp_compare_node_view($node, $view_mode, $langcode) {
+  if ($view_mode == 'search_result' || !in_array($node->type, uc_product_types())) {
+    return;
+  }
+  if (!isset($node->taxonomy_catalog[LANGUAGE_NONE][0]['tid'])) {
+    return;
+  }
+  $path = current_path();
+  if (preg_match('/catalog\/\d+\/all/', $path)) {
+    return;
+  }
+
+  drupal_add_js(drupal_get_path('module', 'lp_compare') . '/js/lp_compare.js');
+  $tid = $node->taxonomy_catalog[LANGUAGE_NONE][0]['tid'];
+
+  $parents = taxonomy_get_parents($tid);
+  $parent = array_shift($parents);
+  if (!empty($parent)) {
+    $tid = $parent->tid;
+  }
+  $node->content['compare'] = array(
+    '#markup' => theme('lp_compare', array('nid' => $node->nid, 'tid' => $tid)),
+  );
+}
+
+function lp_product_in_comparison($tid, $nid) {
+  $nids = lp_get_comparison_list($tid);
+  return in_array($nid, $nids);
+}
+
+function lp_get_comparison_list($tid) {
+  if (!isset($_SESSION['comparison_list'][$tid])) {
+    $_SESSION['comparison_list'][$tid] = array();
+  }
+  return $_SESSION['comparison_list'][$tid];
+}
+
+function lp_set_comparison_list($tid, $nids) {
+  $_SESSION['comparison_list'][$tid] = $nids;
+}
+
+function lp_compare_list($tid) {
+  if (($type = lp_get_type_by_tid($tid)) == false) {
+    drupal_not_found();
+  }
+
+  $nids = lp_get_comparison_list($tid);
+  if (empty($nids)) {
+    return t('No products in comparison.');
+  }
+
+  $nodes = node_load_multiple($nids);
+  foreach ($nodes as $key => $node) {
+    $nodes[$key] = node_view($node);
+  }
+
+  $table[0] = array('');
+  foreach ($nodes as $node) {
+    $table[0][] = mtech_product_image($node['#node'], 'thumbnail_170');
+  }
+
+  $table[1] = array(t('Price'));
+  foreach ($nodes as $node) {
+    $table[1][] = theme('uc_price', array('price' => $node['#node']->price)) . '</div>';
+  }
+
+  $i = 2;
+
+  $fields = field_info_instances('node', $type);
+  $group = field_group_load_field_group('group_specification', 'node', $type, 'form');
+  if (!empty($group)) {
+    foreach ($group->children as $field_name) {
+      $field = $fields[$field_name];
+      $values = array();
+      foreach ($nodes as $node) {
+        $node[$field_name]['#label_display'] = 'hidden';
+        $values[] = render($node[$field_name]);
+      }
+      $equal = true;
+      $value0 = $values[0];
+      foreach ($values as $value) {
+        if ($value != $value0) {
+          $equal = false;
+          break;
+        }
+      }
+      if (!$equal) {
+        $table[$i] = array_merge(array($field['label']), $values);
+        $i++;
+      }
+    }
+  }
+
+  $table[$i] = array('');
+  foreach ($nodes as $node) {
+    $node['add_to_cart']['#form']['actions']['submit']['#value'] = t('To cart');
+    $table[$i][] = render($node['add_to_cart']);
+  }
+
+  $n = count($table);
+  $m = count($nodes);
+
+  $output = '<table class="product-compare-table">';
+  foreach ($table as $i => $tr) {
+    $output .= '<tr ' . ($i == $n - 1 ? ' class="last"' : '') . '>';
+    foreach ($tr as $j => $td) {
+      $classes = array();
+      if ($j == 0) {
+        $classes[] = 'first';
+      }
+      if ($j == $m) {
+        $classes[] = 'last';
+      }
+      $classes = empty($classes) ? '' : ' class="' . implode(' ', $classes) . '"';
+      $output .= '<td' . $classes . '>' . $td . '</td>';
+    }
+    $output .= '</tr>';
+  }
+  $output .= '</table>';
+
+  return $output;
+}

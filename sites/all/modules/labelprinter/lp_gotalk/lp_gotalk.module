@@ -1,0 +1,29 @@
+<?php
+function lp_gotalk_menu() {
+  $items = array();
+  $items['admin/config/services/gotalk'] = array(
+    'title' => 'Gotalk',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_gotalk_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+function lp_gotalk_admin() {
+  $form = array();
+  $form['lp_gotalk_code'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Gotalk code'),
+    '#default_value' => variable_get('lp_gotalk_code', ''),
+  );
+  return system_settings_form($form);
+}
+
+function lp_gotalk_page_build(&$page) {
+  $code = variable_get('lp_gotalk_code', '');
+  if (!empty($code)) {
+    $page['footer'] = array('#markup' => $code);
+  }
+}

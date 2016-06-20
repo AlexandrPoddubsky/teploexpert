@@ -1,0 +1,62 @@
+<?php
+function lp_formatter_field_formatter_info() {
+  return array(
+    'text_summary_or_truncated' => array(
+      'label' => t('Truncated summary or text'),
+      'field types' => array('text_with_summary'),
+      'settings'  => array(
+        'max_length' => 150,
+        'ellipsis' => false,
+      ),
+    ),
+  );
+}
+
+function lp_formatter_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $element = array();
+  $element['max_length'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Truncate to length'),
+    '#default_value' => $settings['max_length'],
+  );
+  $element['ellipsis'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add ellipsis'),
+    '#default_value' => $settings['ellipsis'],
+  );
+  return $element;
+}
+
+function lp_formatter_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = t('Max length: @length<br />With ellipsis: @ellipsis', array(
+    '@length' => $settings['max_length'],
+    '@ellipsis' => $settings['ellipsis'] ? 'true' : 'false',
+  ));
+  return $summary;
+}
+
+function lp_formatter_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  if ($field['type'] == 'text_with_summary' && $display['type'] == 'text_summary_or_truncated') {
+    $settings = $display['settings'];
+    $element = array();
+    if (!empty($items)) {
+      $text = empty($items[0]['summary']) ? $items[0]['value'] : $items[0]['summary'];
+      $element[0]['#markup'] = lp_formatter_truncate_text($text, $settings['max_length'], true, $settings['ellipsis']);
+    }
+    return $element;
+  }
+}
+
+function lp_formatter_truncate_text($text, $max_length = 50, $word_boundary = true, $ellipsis = true) {
+  $text = strip_tags($text);
+  $alter = array(
+    'max_length' => $max_length,
+    'word_boundary' => $word_boundary,
+    'ellipsis' => $ellipsis,
+  );
+  return views_trim_text($alter, $text);
+}

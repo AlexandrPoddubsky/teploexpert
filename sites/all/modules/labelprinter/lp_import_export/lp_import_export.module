@@ -1,0 +1,21 @@
+<?php
+function lp_import_export_menu() {
+  $items = array();
+  $items['admin/content/import'] = array(
+    'title' => t('Product import'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_import_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'lp_import_export.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/content/export'] = array(
+    'title' => t('Product export'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_export_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'lp_import_export.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}

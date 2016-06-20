@@ -1,0 +1,51 @@
+#: lp_catalog.module:102
+msgid "Vendor menu"
+msgstr "Меню производителей"
+
+#: lp_catalog.module:105
+msgid "Catalog menu"
+msgstr "Меню каталога"
+
+#: lp_catalog.module:108
+msgid "Catalog links"
+msgstr "Ссылки каталога"
+
+#: lp_catalog.module:275
+msgid "Series"
+msgstr "Серии"
+
+#: lp_catalog.module:288
+msgid "Tags"
+msgstr "Теги"
+
+#: lp_catalog.module:495
+msgid "From cheap to expensive"
+msgstr "От дешевых к дорогим"
+
+#: lp_catalog.module:499
+msgid "From expensive to cheap"
+msgstr "От дорогих к дешевым"
+
+#: lp_catalog.module:503
+msgid "Title ascending"
+msgstr "По алфавиту в порядке возрастания"
+
+#: lp_catalog.module:507
+msgid "Title descending"
+msgstr "По алфавиту в порядке убывания"
+
+#: lp_catalog.module:524
+msgid "Display: "
+msgstr "Отображать: "
+
+#: lp_catalog.module:303
+msgid "Vendors"
+msgstr "Производители"
+
+#: lp_catalog.module:303
+msgid "All products"
+msgstr "Все товары"
+
+#: lp_catalog.module:303
+msgid "Items per page: "
+msgstr "Товаров на странице: "

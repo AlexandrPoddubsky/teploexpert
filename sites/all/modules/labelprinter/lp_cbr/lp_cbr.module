@@ -1,0 +1,194 @@
+<?php
+define('LP_CBR_API_URL', 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=' . date('d/m/Y'));
+define('LP_CBR_ATTEMPTS', 5);
+
+function lp_cbr_menu() {
+  $items = array();
+  $items['admin/store/settings/currency'] = array(
+    'title' => t('Currency'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_cbr_admin'),    
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'lp_cbr.admin.inc'
+  );  
+  return $items;
+}
+
+function lp_cbr_form_alter(&$form, &$form_state, $form_id) {
+  if (uc_product_is_product_form($form)) {
+    $form['base']['prices']['cost']['#access'] = false;
+    $form['base']['prices']['list_price']['#access'] = false;
+
+    $options = array('RUB' => 'RUB');
+    foreach (lp_cbr_get_currencies() as $currency) {
+      $options[$currency] = $currency;
+    }
+    $form['base']['prices']['original_pricing'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Original price'),
+    );
+    $form['base']['prices']['original_pricing']['original_price'] = array(
+      '#type' => 'uc_price',
+      '#title' => t('Price'),
+      '#field_suffix' => '',
+      '#default_value' => isset($form['#node']->original_price) ? $form['#node']->original_price : null,
+    );
+    $form['base']['prices']['original_pricing']['original_currency'] = array(
+      '#type' => 'select',
+      '#title' => t('Currency'),
+      '#options' => $options,
+      '#default_value' => isset($form['#node']->original_currency) ? $form['#node']->original_currency : null,
+    );
+  }
+}
+
+function lp_cbr_node_load($nodes, $types) {
+  $vids = array();
+  foreach ($nodes as $node) {
+    $vids[$node->nid] = $node->vid;
+  }
+
+  $result = db_query('SELECT nid, original_price, original_currency FROM {uc_products} WHERE vid IN (:vids)', array(':vids' => $vids));
+  foreach ($result as $node) {
+    $nodes[$node->nid]->original_price = $node->original_price;
+    $nodes[$node->nid]->original_currency = $node->original_currency;
+  }
+}
+
+function lp_cbr_node_update($node) {
+  if (!in_array($node->type, uc_product_types())) {
+    return;
+  }
+  lp_cbr_set_node_price($node);
+  lp_cbr_update_prices($node->vid);
+}
+
+function lp_cbr_node_insert($node) {
+  if (!in_array($node->type, uc_product_types())) {
+    return;
+  }
+  lp_cbr_set_node_price($node);
+  lp_cbr_update_prices($node->vid);
+}
+
+function lp_cbr_set_node_price($node) {
+  db_update('uc_products')->fields(array(
+    'original_price' => $node->original_price,
+    'original_currency' => $node->original_currency,
+  ))->condition('vid', $node->vid)->execute();  
+}
+
+function lp_cbr_get_currencies() {
+  return array('USD', 'EUR');
+}
+
+function lp_cbr_get_conversion_rates() {
+  $rates = array();
+  foreach (lp_cbr_get_currencies() as $currency) {
+    $rates[$currency] = variable_get('lp_cbr_conversion_rate_' . strtolower($currency), 1);
+  }
+  return $rates;
+}
+
+function lp_cbr_set_conversion_rates($rates) {
+  foreach ($rates as $currency => $rate) {
+    variable_set('lp_cbr_conversion_rate_' . strtolower($currency), $rate);
+  }
+}
+
+function lp_cbr_update_conversion_rates() {
+  $currencies = lp_cbr_get_currencies();
+  $rates = array();
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, LP_CBR_API_URL);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)');
+  $response = curl_exec($ch);
+  $info = curl_getinfo($ch);
+  curl_close($ch);
+
+  if ($info['http_code'] != 200 || empty($response)) {
+    return false;
+  }
+
+  $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOWARNING);
+  if (!$xml) {
+    return false;
+  }
+  $data = $xml->children();
+  
+  foreach ($data as $currency) {
+    if (!isset($currency->CharCode) || !isset($currency->Value)) {
+      return false;
+    }
+    if (in_array($currency->CharCode, $currencies)) {
+      $rates[$currency->CharCode->__toString()] = (float) str_replace(',', '.', $currency->Value->__toString());
+    }
+  }
+
+  if (count($rates) == count($currencies)) {
+    lp_cbr_set_conversion_rates($rates);
+    return true;
+  }
+
+  return false;
+}
+
+function lp_cbr_mail($key, &$message, $params) {
+  if ($key == 'autoupdate_failed') {
+    $message['subject'] = '[' . variable_get('site_name') . '] ' . t('Error upon currency update.');
+    $message['body'] = array(
+      t('Automatic update of currency conversion rates and product prices failed after @n attempts.', array('@n' => LP_CBR_ATTEMPTS)),
+    );
+  }
+}
+
+function lp_cbr_cron() {
+  if (variable_get('lp_cbr_autoupdate', false)) {
+    $last_update = variable_get('lp_cbr_last_update', null);
+    $now = date('Y-m-d', time());
+
+    if ($last_update == $now) {
+      $attempts = variable_get('lp_cbr_attempts', 0);
+      if ($attempts == -1) {
+        return;     
+      }
+    } else {
+      variable_set('lp_cbr_last_update', $now);
+      variable_set('lp_cbr_attempts', 0);
+      $attempts = 0;
+    }
+
+    if (lp_cbr_update_conversion_rates()) {
+      variable_set('lp_cbr_attempts', -1);
+      variable_set('lp_cbr_update_prices', true);
+    } else {
+      $attempts++;
+      if ($attempts == LP_CBR_ATTEMPTS && $to = variable_get('site_mail', '')) {
+        drupal_mail('lp_cbr', 'autoupdate_failed', $to, language_default());
+        $attempts = -1;
+      }
+      variable_set('lp_cbr_attempts', $attempts);
+    }
+  }
+
+  if (variable_get('lp_cbr_update_prices', false)) {
+    lp_cbr_update_prices();
+  }
+}
+
+function lp_cbr_update_prices($vid = null) {
+  $rates = lp_cbr_get_conversion_rates();
+
+  $query = "UPDATE {uc_products} SET sell_price = IFNULL(IF(original_currency = 'RUB', original_price, IF(original_currency = 'USD', original_price * :usd, original_price * :eur)), 0)";
+  $params = array(':eur' => $rates['EUR'], ':usd' => $rates['USD']);
+  if ($vid) {
+    $query .= " WHERE vid = :vid";
+    $params[':vid'] = $vid;
+  }
+  db_query($query, $params);
+
+  variable_set('lp_cbr_update_prices', false);
+}

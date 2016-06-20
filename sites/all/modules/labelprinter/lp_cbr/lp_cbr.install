@@ -1,0 +1,5 @@
+<?php
+function lp_cbr_install() {
+  db_query('ALTER TABLE {uc_products} ADD original_price DECIMAL(16, 5) AFTER model');  
+  db_query('ALTER TABLE {uc_products} ADD original_currency VARCHAR(3) AFTER original_price');  
+}

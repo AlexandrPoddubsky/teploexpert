@@ -1,0 +1,482 @@
+<?php
+function lp_filter_menu() {
+  $items = array();
+  $items['admin/config/product_filter'] = array(
+    'title' => t('Product filter'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lp_filter_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'lp_filter.admin.inc'
+  );
+  return $items;
+}
+
+function lp_filter_menu_alter(&$items) {
+  $items['catalog']['page callback'] = 'lp_filter_catalog_browse';
+
+  $items['taxonomy/term/%taxonomy_term']['page callback'] = 'lp_filter_taxonomy_term_page';
+  unset($items['taxonomy/term/%taxonomy_term']['file']);
+}
+
+function lp_filter_block_info() {
+  $blocks['product_filter'] = array(
+    'info' => t('Product filter'),
+  );
+  return $blocks;
+}
+
+function lp_filter_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'product_filter':
+      if (arg(0) != 'catalog') {
+        break;
+      }
+      $vendor = arg(1);
+      $category = arg(2);
+      if (($type = lp_get_type_by_tid($category)) == false) {
+        break;
+      }
+      $form = drupal_get_form('lp_product_filter_form', $vendor, $category, $type);
+      $block['subject'] = '';
+      $block['content'] = render($form);
+    break;
+  }
+  return $block;
+}
+
+function lp_get_type_by_tid($tid) {
+  $parents = taxonomy_get_parents($tid);
+  if (!empty($parents)) {
+    $parent = array_shift($parents);
+    $tid = $parent->tid;
+  }
+  return variable_get('lp_filter_' . $tid);
+}
+
+function lp_product_filter_form($form, &$form_state, $vendor, $category, $type) {
+  $form = array();
+
+  $input = isset($_SESSION['filter']) ? $_SESSION['filter'] : array();
+
+  $form['price'] = lp_price_element(t('Price'), isset($input['price']) ? $input['price'] : array());
+
+  $fields = field_info_instances('node', $type);
+  $group = field_group_load_field_group('group_specification', 'node', $type, 'form');  
+  if (!empty($group)) {
+    foreach ($group->children as $field_name) {
+      if (!isset($fields[$field_name])) {
+        continue;
+      }
+
+      $field = $fields[$field_name];
+      $label = $field['label'];
+
+      if (isset($field['enable_filter']) && !$field['enable_filter']) {
+        continue;
+      }
+
+      $default_value = isset($input[$field_name]) ? $input[$field_name] : array();
+      switch ($field['widget']['type']) {
+        case 'number':
+          $suffix = $field['settings']['suffix'];
+          if (!empty($suffix)) {
+            $label .= ', ' . $suffix;
+          }
+          if (isset($field['enable_slider']) && $field['enable_slider']) {
+            $values = lp_get_field_values($field_name, $type, true);
+            $default_value = array(
+              'value' => empty($default_value['value']) ? $values['min_value'] : $default_value['value'], 
+              'value2' => empty($default_value['value2']) ? $values['max_value'] : $default_value['value2'], 
+            );
+            $form[$field_name] = array(
+              '#type' => 'slider',
+              '#title' => $label,
+              '#min' => $values['min_value'],
+              '#max' => $values['max_value'],
+              '#default_value' => empty($default_value) ? array('value' => $values['min_value'], 'value2' => $values['max_value']) : $default_value,
+              '#range' => true,
+              '#input_title' => null,
+              '#input2_title' => null,
+              '#states' => array(
+                'disabled' => array(
+                  '#edit-enable-' . str_replace('_', '-', $field_name) => array('checked' => false),
+                ),
+              ),
+            );
+            $form['enable_' . $field_name] = array(
+              '#type' => 'checkbox',
+              '#title' => t('Use this filter'),
+              '#default_value' => isset($input['enable_' . $field_name]) ? $input['enable_' . $field_name] : 0,
+            );
+          } else {
+            $values = lp_get_field_values($field_name, $type);
+            $form[$field_name] = array(
+              '#type' => 'checkboxes',
+              '#title' => $label,
+              '#options' => $values,
+              '#default_value' => $default_value,
+            );
+          }
+          break;
+        case 'text_textfield':
+          $values = lp_get_field_values($field_name, $type);
+          $form[$field_name] = array(
+            '#type' => 'checkboxes',
+            '#title' => $label,
+            '#options' => $values,
+            '#default_value' => $default_value,
+          );
+          break;
+        case 'range':
+          $values = lp_get_range_field_values($field_name, $type);
+          $suffix = $field['settings']['to']['suffix'];
+          if (!empty($suffix)) {
+            $label .= ', ' . $suffix;
+          }
+          if (($element = lp_range_element($label, $values, $default_value)) !== false) {
+            $form[$field_name] = $element;
+          }
+          break;
+      }
+    }
+  }
+
+  $form['vendor'] = array(
+    '#type' => 'hidden',
+    '#value' => $vendor,
+  );
+  $form['category'] = array(
+    '#type' => 'hidden',
+    '#value' => $category,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Apply'),
+    '#prefix' => '<div class="submit-wrapper">',
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+function lp_product_filter_form_submit($form_id, &$form_state) {
+  $_SESSION['filter'] = $form_state['input'];
+}
+
+function lp_get_field_values($field, $type, $min_max = false) {
+  $query = db_select('field_data_' . $field, 'f');
+  $query->join('node', 'n', 'n.nid = f.entity_id');
+  $query->condition('n.status', 1, '=');
+
+  if ($min_max) {
+    $query->addExpression("MIN(f.{$field}_value)", 'min_value');
+    $query->addExpression("MAX(f.{$field}_value)", 'max_value');
+  } else {
+    $query->fields('f', array($field . '_value'));
+    $query->distinct();
+  }
+
+  $query->condition('n.type', $type, '=');
+
+  if ($min_max) {
+    $values = $query->execute()->fetchAssoc();
+    $values['min_value'] = floor($values['min_value']);
+    $values['max_value'] = ceil($values['max_value']);
+  } else {
+    $result = $query->execute();
+    $values = array();
+    while ($value = $result->fetchField()) {
+      $values[$value] = $value;
+    }
+  }
+  return $values;
+}
+
+function lp_get_range_field_values($field, $type) {
+  $field_from = $field . '_from';
+  $field_to = $field . '_to';
+  $query = db_select('field_data_' . $field, 'f');
+  $query->fields('f', array($field_from, $field_to));
+  $query->join('node', 'n', 'n.nid = f.entity_id');
+  $query->condition('n.type', $type, '=');
+  $query->condition('n.status', 1, '=');
+  $query->distinct();
+  $result = $query->execute();
+  $values = array();
+  while ($value = $result->fetchAssoc()) {
+    $values[$value[$field_from] . '|' . $value[$field_to]] = array(
+      'min_value' => $value[$field . '_from'],
+      'max_value' => $value[$field . '_to'],
+    );
+  }
+  return $values;
+}
+
+function lp_price_element($label, $default_value) {
+  $price_ranges = explode("\n", variable_get('lp_filter_price'));
+  $ranges = array();
+  foreach ($price_ranges as $price_range) {
+    list($min, $max) = explode('|', $price_range);
+    $min = empty($min) ? 0 : $min;
+    $max = empty($max) ? 'inf' : $max;
+    $ranges[] = array('min' => floatval($min), 'max' => floatval($max));
+  }
+  $options = array();
+  foreach ($ranges as $range) {
+    $key = $range['min'] . '|' . $range['max'];
+    if ($range['min'] == 0) {
+      $label = t('To @to', array('@to' => number_format($range['max'])));
+    } elseif ($range['max'] == 'inf') {
+      $label = t('More than @from', array('@from' => number_format($range['min'])));
+    } else {
+      $label = t('From @from to @to', array('@from' => number_format($range['min']), '@to' => number_format($range['max'])));
+    }
+    $options[$key] = $label; 
+  }
+  return array(
+	'#title' => 'Цена',
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => $default_value,
+  );
+}
+
+function lp_range_element($label, $values, $default_value) {
+  $options = array();
+  foreach ($values as $value) { 
+    $options[$value['min_value'] . '|' . $value['max_value']] = $value['min_value'] . ' - ' . $value['max_value'];
+  }
+  if (empty($options)) {
+    return false;
+  }
+  return array(
+    '#type' => 'checkboxes',
+    '#title' => $label,
+    '#options' => $options,
+    '#default_value' => $default_value,
+  );
+}
+
+function lp_filter_views_query_alter(&$view, &$query) {
+  if ($view->name != 'catalog' || $view->current_display !== 'page') {
+    return;
+  }
+
+  $join = new views_join;
+  $join->construct('uc_products', 'node', 'nid', 'nid');
+  $query->add_relationship('p', $join, 'node');
+
+  $orderby = $query->orderby;
+  $query->orderby = array();
+  $query->add_orderby(null, 'p.sell_price = 0', 'ASC', 'discontinued');
+
+  if (db_table_exists('field_data_field_clarify')) {
+    $join = new views_join;
+    $join->construct('field_data_field_clarify', 'node', 'nid', 'entity_id');
+    $query->add_relationship('a', $join, 'node');
+    $query->add_orderby(null, 'a.field_clarify_value IS NOT NULL AND a.field_clarify_value = 1', 'ASC', 'clarify');
+  }
+
+  foreach ($orderby as $item) {
+    $query->orderby[] = $item;
+  }
+
+  if (!isset($_SESSION['filter'])) {
+    return;
+  }
+  $input = $_SESSION['filter'];
+
+  if ($view->args[0] != $input['vendor'] || $view->args[1] != $input['category']) {
+    unset($_SESSION['filter']);
+    return;
+  }
+  
+
+  if (($type = lp_get_type_by_tid($_SESSION['filter']['category'])) == false) {
+    return;
+  }
+
+  $or = db_or();
+  $j = 0;
+  foreach ($input['price'] as $range) {
+    if (empty($range)) {
+      continue;
+    }
+    list($price_min, $price_max) = explode('|', $range);
+    if ($price_max == 'inf' || $price_max == 0) {
+      $or->where("p.sell_price >= :price_min{$j}", array(":price_min{$j}" => (float) $price_min));
+    } else {
+      $or->where("p.sell_price >= :price_min{$j} AND p.sell_price <= :price_max{$j}", array(":price_min{$j}" => (float) $price_min, ":price_max{$j}" => (float) $price_max));
+    }
+    $j++;
+  }
+  if ($j) {
+    $query->add_where(null, $or);
+  }
+
+  $fields = field_info_instances('node', $type);
+  $group = field_group_load_field_group('group_specification', 'node', $type, 'form');  
+  $i = 0;  
+  if(isset($group->children)){
+  foreach ($group->children as $field_name) {
+    if (!isset($input[$field_name])) {
+      continue;
+    }
+    
+    $field = $fields[$field_name];
+    $values = array_diff($input[$field_name], array(null));
+    if (empty($values)) {
+      continue;
+    }
+
+    $join = new views_join;
+    $join->construct('field_data_' . $field_name, 'node', 'nid', 'entity_id');
+    $query->add_relationship("f{$i}", $join, 'node');
+    switch ($field['widget']['type']) {
+      case 'text_textfield':
+        $query->add_where(null, "f{$i}.{$field_name}_value", $values, 'IN');
+        break;
+      case 'number':
+        if (isset($field['enable_slider']) && $field['enable_slider']) {
+          $query->add_where(null, "f{$i}.{$field_name}_value", $values['value'], '>=');
+          $query->add_where(null, "f{$i}.{$field_name}_value", $values['value2'], '<=');
+        } else {
+          $or = db_or();
+          $j = 0;
+          foreach ($values as $value) {
+            $or->where("abs(f{$i}.{$field_name}_value - :p{$i}{$j}) < 1e-7", array(":p{$i}{$j}" => $value));
+            $j++;
+          }
+          $query->add_where(null, $or);
+        }
+        break;
+      case 'range':
+        $or = db_or();
+        $j = 0;
+        foreach ($values as $value) {
+          list($min, $max) = explode('|', $value);
+          $or->where("abs(f{$i}.{$field_name}_from - :p{$i}{$j}) < 1e-7", array(":p{$i}{$j}" => $min));
+          $or->where("abs(f{$i}.{$field_name}_to - :q{$i}{$j}) < 1e-7", array(":q{$i}{$j}" => $max));
+          $j++;
+        }
+        $query->add_where(null, $or);
+        break;
+    }
+    $i++;
+  } }
+}
+
+function lp_filter_product_list($vendor_tid, $category_tid) {
+  print views_embed_view('catalog', 'page', $vendor_tid, $category_tid);
+}
+
+function lp_filter_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'field_ui_field_edit_form') {
+    if ($form['#instance']['entity_type'] != 'node') {
+      return;
+    } 
+
+    $classes = uc_product_types();
+    $type = $form['#instance']['bundle'];
+    if (!in_array($type, $classes)) {
+      return;
+    }
+
+    $field = $form['#instance']['field_name'];
+    $group = field_group_load_field_group('group_specification', 'node', $type, 'form');
+    if (empty($group) || !in_array($field, $group->children)) {
+      return;
+    }
+
+    $form['instance']['enable_filter'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable filter'),
+      '#default_value' => isset($form['#instance']['enable_filter']) ? $form['#instance']['enable_filter'] : true,
+    );
+    if ($form['#instance']['widget']['type'] == 'number') {
+      $form['instance']['enable_slider'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Display filter as slider'),
+        '#default_value' => isset($form['#instance']['enable_slider']) ? $form['#instance']['enable_slider'] : false,
+        '#states' => array(
+          'disabled' => array(
+            '#edit-instance-enable-filter' => array('checked' => false),
+          ),
+        ),
+      );
+    }
+  }
+}
+
+function lp_filter_taxonomy_term_page($term) {
+  drupal_set_title($term->name);
+
+  $current = (object) array(
+    'tid' => $term->tid,
+  );
+
+  $breadcrumb = array();
+  while ($parents = taxonomy_get_parents($current->tid)) {
+    $current = array_shift($parents);
+    $breadcrumb[] = l($current->name, 'taxonomy/term/' . $current->tid);
+  }
+  $breadcrumb[] = l(t('Home'), NULL);
+  $breadcrumb = array_reverse($breadcrumb);
+  drupal_set_breadcrumb($breadcrumb);
+  drupal_add_feed('taxonomy/term/' . $term->tid . '/feed', 'RSS - ' . $term->name);
+
+  $uri = entity_uri('taxonomy_term', $term);
+  drupal_add_html_head_link(array('rel' => 'canonical', 'href' => url($uri['path'], $uri['options'])), TRUE);
+  drupal_add_html_head_link(array('rel' => 'shortlink', 'href' => url($uri['path'], array_merge($uri['options'], array('alias' => TRUE)))), TRUE);
+
+  $build['term_heading'] = array(
+    '#prefix' => '<div class="term-listing-heading">',
+    '#suffix' => '</div>',
+    'term' => taxonomy_term_view($term, 'full'),
+  );
+
+  if ($nids = lp_filter_taxonomy_select_nodes($term->tid)) {
+    $nodes = node_load_multiple($nids);
+    $build += node_view_multiple($nodes);
+    $build['pager'] = array(
+      '#theme' => 'pager',
+      '#weight' => 5,
+    );
+  }
+  else {
+    $build['no_content'] = array(
+      '#prefix' => '<p>',
+      '#markup' => t('There is currently no content classified with this term.'),
+      '#suffix' => '</p>',
+    );
+  }
+  return $build;
+}
+
+function lp_filter_taxonomy_select_nodes($tid) {
+  $limit = variable_get('default_nodes_main', 10);
+  if (!variable_get('taxonomy_maintain_index_table', TRUE)) {
+    return array();
+  }
+
+  $query = db_select('taxonomy_index', 't');
+  $query->addTag('node_access');
+  $query->join('uc_products', 'p', 'p.nid = t.nid');
+  $query->condition('tid', $tid);
+
+  $count_query = clone $query;
+  $count_query->addExpression('COUNT(t.nid)');
+
+  $query = $query->extend('PagerDefault');
+  $query = $query->limit($limit);
+  $query->setCountQuery($count_query);
+  $query->addField('t', 'nid');
+  $query->addField('t', 'tid');
+
+  $query->orderBy('p.sell_price = 0', 'ASC');
+  $query->orderBy('p.sell_price', 'ASC');
+
+  return $query->execute()->fetchCol();
+}

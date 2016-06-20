@@ -1,0 +1,27 @@
+#: lp_compare.module:7
+msgid "Product comparison"
+msgstr "Сравнение товаров"
+
+#: lp_compare.module:36
+msgid "You can compare @n products or less."
+msgstr "Вы можете сравнить не более @n товаров."
+
+#: lp_compare.module:84
+msgid "No products in comparison."
+msgstr "Нет товаров для сравнения."
+
+#: lp_compare.module:97
+msgid "Price"
+msgstr "Цена"
+
+#: lp_compare.module:131
+msgid "To cart"
+msgstr "Добавить в корзину"
+
+#: templates/lp_compare.tpl.php:7
+msgid "compare"
+msgstr "к сравнению"
+
+#: templates/lp_compare.tpl.php:9
+msgid "add to comparison"
+msgstr "сравнить"

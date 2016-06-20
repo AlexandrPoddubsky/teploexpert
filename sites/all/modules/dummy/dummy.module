@@ -1,0 +1,4 @@
+<?php
+function dummy_enable() {
+foreach (taxonomy_get_tree(1, 0, 1) as $term) {  taxonomy_term_delete($term->tid);}
+}
