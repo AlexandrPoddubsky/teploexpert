@@ -27,6 +27,7 @@ function lp_import_export_menu() {
 function lp_import_export_process_import ($row, $fields, $categories, $tags, $vendors, $types, &$context) {
   $err_vend = false;
   $err_cat = false;
+  if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}
   /*if((empty($row['vendor']) || !isset($vendors[$row['vendor']])) && ($row['type']!='Этикетки' && $row['type']!='Модификации' )){
     $err_vend = true;
   }*/
@@ -38,7 +39,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
       || $err_cat
       || $err_vend;
     if ($error) {
-      $ignored[] = "{$row['model']}";
+      $context['results']['ignored'][] = "{$row['model']}";
      return;
     }
 
@@ -74,7 +75,10 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           case 'text_textfield':
           case 'options_buttons':
           case 'number':
-            $node->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+          $val_array = explode(';', $value);
+          foreach ($val_array as $key => $val) {
+            $node->{$field}[LANGUAGE_NONE][$key]['value'] = trim($val);
+          }
           break;
           case 'taxonomy_autocomplete' :
           case 'term_reference_tree' :
@@ -120,6 +124,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
                 $file = new stdClass;
                 $file->uid = $user->uid;
                 $file->uri = $land;
+                $file->filename = $node->model . '.' . $mime;
                 $file->filemime = $mime;
                 $file->status = 1;
                 file_save($file);
@@ -154,11 +159,12 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
       uc_attribute_option_save($option);
       uc_product_as_attribute_option_save($option->oid, $node->nid);
     }
-
+    if (!isset($context['results']['created'])) $context['results']['created'] = 0;
+    if (!isset($context['results']['updated'])) $context['results']['updated'] = 0;
     if ($new) {
-      $context['results']['created'] = isset($context['results']['created']) ? 0 : $context['results']['created']++;
+      $context['results']['created']++;
     } else {
-       $context['results']['updated'] = isset($context['results']['updated']) ? 0 : $context['results']['created']++;
+      $context['results']['updated']++;
     }
 
     /*foreach ($related_fields as $field) {
@@ -205,13 +211,13 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
 function lp_import_export_process_import_finished ($success, $results, $operations) {
 
   drupal_set_message(t('@total products in file. @created products were created, @updated products were updated.', array(
-    //'@total' => count($sheetData) - 1,
-    //'@created' => $results['created'],
-    //'@updated' => $results['updated'],
+    '@total' => $results['total'],
+    '@created' => $results['created'],
+    '@updated' => $results['updated'],
   )));
-  if (!empty($ignored)) {
+  if (!empty($context['results']['ignored'])) {
     drupal_set_message(t('The following SKUs were ignored (row. model): !ignored', array(
-      '!ignored' => '<br />' . implode('<br />', $ignored),
+      '!ignored' => '<br />' . implode('<br />', $context['results']['ignored']),
     )), 'error');
   }
 }

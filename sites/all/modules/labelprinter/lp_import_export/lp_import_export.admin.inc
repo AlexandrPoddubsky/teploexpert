@@ -1,8 +1,19 @@
 <?php
 function lp_import_form() {
+
   $form = array();
   $form['description'] = array(
     '#markup' => t('This form allows to import product data.') . '<br />',
+  );
+  $node_types = node_type_get_types();
+  $types = array();
+  foreach (uc_product_types() as $type) {
+    $types[$type] = $node_types[$type]->name;
+  }
+  $form['types'] = array(
+    '#type' => 'radios',
+    '#title' => t('Product types'),
+    '#options' => $types,
   );
   $form['products'] = array(
     '#type' => 'file',
@@ -30,7 +41,7 @@ function lp_export_form() {
     $types[$type] = $node_types[$type]->name;
   }
   $form['types'] = array(
-    '#type' => 'checkboxes',
+    '#type' => 'radios',
     '#title' => t('Product types'),
     '#options' => $types,
   );
@@ -65,8 +76,8 @@ function lp_import_form_submit($form_id, &$form_state) {
     drupal_set_message(t('File is empty.'), 'error');
     return;
   }
-
-  $fields = lp_import_export_get_fields();
+  $type = $form_state['values']['types'];
+  $fields = lp_import_export_get_fields($type);
   $node_types = node_type_get_types();
   $types = array();
   foreach (uc_product_types() as $type) {
@@ -113,7 +124,7 @@ $batch = array (
     'title' => 'Импорт товаров',
     // Сообщение, показываемое при инициализации.
     // Опционально, по умолчанию t('Initializing.')
-    'init_message' => 'Подготовка данных',
+    'init_message' => 'Импорт товаров',
     // Сообщение, показывемое при выполнении операций.
     // Опционально, по умолчанию t('Completed @current of @total.')
     'progress_message' => 'Выполнено @current из @total.',
@@ -126,7 +137,7 @@ batch_set($batch);
 }
 
 function lp_export_form_submit($form_id, &$form_state) {
-  $types = array_diff($form_state['values']['types'], array(0));
+  $types = $form_state['values']['types'];
   if (empty($types)) {
     drupal_set_message(t('No product types were selected'), 'error');
     return;
@@ -134,7 +145,7 @@ function lp_export_form_submit($form_id, &$form_state) {
 
   $result = db_select('node', 'n')
     ->fields('n', array('nid'))
-    ->condition('n.type', $types, 'IN')
+    ->condition('n.type', $types)
     ->execute()->fetchAll();
   $nids = array();
   foreach ($result as $row) {
@@ -146,7 +157,7 @@ function lp_export_form_submit($form_id, &$form_state) {
   require_once(libraries_get_path('phpexcel') . '/PHPExcel.php');
   $objPHPExcel = new PHPExcel();
 
-  $fields = lp_import_export_get_fields();
+  $fields = lp_import_export_get_fields($types);
   $node_types = node_type_get_types();
   $categories = array();
   foreach (lp_misc_get_terms_by_vocabulary_name('categories') as $term) {
@@ -200,17 +211,31 @@ function lp_export_form_submit($form_id, &$form_state) {
     foreach ($fields as $field => $field_info) {
       switch ($field_info['type']) {
         case 'raw':
+        if ($field == 'type') {
+          $value = $node_types[$node->type]->name; }
+          else
           $value = isset($node->$field) ? $node->$field: null;
           break;
         case 'text_textarea_with_summary':
         case 'text_textfield':
         case 'options_buttons':
         case 'number':
-            $value = empty($node->$field) ? null : $node->{$field}[LANGUAGE_NONE][0]['value'];
+        if (empty($node->$field)) {
+            $value = null;
+            break;
+          }
+            $val_array = array();
+            foreach ($node->{$field}[LANGUAGE_NONE] as $val) {
+              $val_array[] = $val['value'];
+            }
+            $value = implode(';', $val_array);
             break;
         case 'taxonomy_autocomplete' :
         case 'term_reference_tree' :
-          if (empty($node->$field)) break;
+          if (empty($node->$field)) {
+            $value = null;
+            break;
+          }
           switch ($field) {
             case 'field_brand':
               $value = $vendors[$node->{$field}[LANGUAGE_NONE][0]['tid']];
@@ -256,8 +281,8 @@ function lp_export_form_submit($form_id, &$form_state) {
   exit;
 }
 
-function lp_import_export_get_fields() {
-  $common_fields = field_info_instances('node', 'boiler');
+function lp_import_export_get_fields($type) {
+  $common_fields = field_info_instances('node', $type);
   $fields = array(
     'model' => array(
       'label' => 'ID',
