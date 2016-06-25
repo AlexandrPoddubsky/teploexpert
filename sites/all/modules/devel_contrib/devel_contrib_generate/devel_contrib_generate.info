@@ -1,0 +1,13 @@
+name = Devel Contrib Generate
+description = Provides support for generating entities of any type.
+package = Development
+dependencies[] = devel_generate
+dependencies[] = devel_contrib
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2016-06-14
+version = "7.x-1.1"
+core = "7.x"
+project = "devel_contrib"
+datestamp = "1465937646"
+
