@@ -25,6 +25,7 @@ function lp_import_export_menu() {
  */
 
 function lp_import_export_process_import ($row, $fields, $categories, $tags, $vendors, $types, &$context) {
+  global $user;
   $err_vend = false;
   $err_cat = false;
   if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}

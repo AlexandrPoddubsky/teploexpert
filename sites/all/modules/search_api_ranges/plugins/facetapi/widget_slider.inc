@@ -56,7 +56,7 @@ class SearchApiRangesWidgetUISlider extends FacetapiWidget {
       '#type' => 'textfield',
       '#title' => t('Auto Submit Delay'),
       '#default_value' => $this->settings->settings['auto-submit-delay'],
-      '#description' => t('Automatically submit form after the user changes 
+      '#description' => t('Automatically submit form after the user changes
         releases slider handles. Enter a delay in milliseconds,
         i.e. 1000 for 1 second.'),
       '#states' => array('visible' => array('select[name="widget"]' => array('value' => $this->id),),),

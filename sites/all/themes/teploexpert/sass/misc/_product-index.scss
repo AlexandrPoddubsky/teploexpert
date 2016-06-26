@@ -1,0 +1,70 @@
+// Catalog Views
+.view-product-index {
+  clear: both;
+  margin-top: 20px;
+  .views-row {
+    width: 30%;
+    float: left;
+    margin: 0 10px 30px 0;
+    padding: 10px;
+    height: 410px;
+    color: color('grey');
+    font-weight: bold;
+    border: 1px solid color('border');
+    position: relative;
+
+    .views-field-title {
+      height: 90px;
+
+      a {
+        text-decoration: none;
+      }
+    }
+
+    .views-field-field-sku {
+      font-style: italic;
+    }
+
+    .views-field-nid {
+      width: 125px;
+      height: 33px;
+      background: url('../images/btn-buy.png') no-repeat;
+      text-indent: -9999px;
+      overflow: hidden;
+      display: block;
+      position: absolute;
+      bottom: -17px;
+      left: 35px;
+    }
+
+    .views-label {
+      font-weight: 100;
+    }
+
+  }
+
+  .item-list {
+    float: left;
+    clear: both;
+  }
+}
+
+//Facet filters
+.block-facetapi {
+  width: 33%;
+  float: left;
+
+  h2 {
+    font-size: font-size('m');
+    font-family: $tahoma;
+  }
+
+  .text-range {
+    display: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000;
+  }
+}

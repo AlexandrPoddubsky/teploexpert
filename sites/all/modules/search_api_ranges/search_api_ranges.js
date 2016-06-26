@@ -41,7 +41,7 @@
         });
 
         rangeFrom.numeric();
-        rangeFrom.bind('keyup', function() {
+        rangeFrom.bind('blur', function() {
           clearTimeout(submitTimeout);
           if (!isNaN(rangeFrom.val()) && rangeFrom.val() !== '') {
             var value = parseInt(rangeFrom.val());
@@ -54,7 +54,7 @@
         });
 
         rangeTo.numeric();
-        rangeTo.bind('keyup', function() {
+        rangeTo.bind('blur', function() {
           clearTimeout(submitTimeout);
           if (!isNaN(rangeTo.val()) && rangeTo.val() !== '') {
             var value = parseInt(rangeTo.val());

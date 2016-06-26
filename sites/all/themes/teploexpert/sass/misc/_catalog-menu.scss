@@ -1,0 +1,92 @@
+// Catalog Superfish menu
+aside .block-menu {
+  border-radius: 5px 5px 0 0;
+  background-image: url('../images/bg-body.png');
+  box-shadow: 0 0 5px color('grey') inset;
+
+  h2 {
+    text-transform: uppercase;
+    background-image: linear-gradient(#fed47a, color('yellow'));
+    border: 1px solid color('yellow');
+    border-radius: 5px 5px 0 0;
+    color: #fff;
+    font-family: $djv-bold;
+    text-shadow: 0 1px 2px #b85700;
+    font-size: 17px;
+    line-height: 47px;
+    text-align: center;
+    margin-bottom: 0;
+  }
+
+  > .menu {
+    line-height: 36px;
+    padding: 0;
+    margin-top: 0;
+
+    li {
+      list-style: none;
+      position: relative;
+
+      &.active-trail {
+        > ul {
+          display: block;
+          position: static;
+          background-color: transparent;
+          box-shadow: none;
+
+          a.active {
+            text-decoration: none;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    > li {
+      float: none;
+      padding-left: 20px;
+      border-bottom: 1px solid color('border');
+
+      > a {
+        color: #000;
+        font-weight: bold;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      ul {
+        position: absolute;
+        left: 100%;
+        top: 0;
+        background-color: #fff;
+        box-shadow: 0 0 5px color('grey');
+        width: 250px;
+        padding: 0;
+        display: none;
+
+        > li {
+          padding: 0 10px;
+
+          > a:not(:hover) {
+            color: #000;
+          }
+
+          &:hover {
+            border-top: 1px solid color('border');
+            border-bottom: 1px solid color('border');
+            box-shadow: 0 0 5px color('border');
+          }
+        }
+      }
+    }
+
+    li:hover {
+        > ul {
+          display: block;
+        }
+      }
+  }
+}

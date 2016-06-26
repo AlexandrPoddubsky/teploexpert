@@ -1,0 +1,145 @@
+// Dependencies.
+@import 'base/headings/headings';
+@import 'components/clearfix/clearfix';
+
+// Branding header
+//
+// Markup: header.twig
+//
+// Style guide: components.header
+
+.header,
+%header {
+  @extend %clearfix;
+  padding-top: 10px;
+
+  // Wrapping link for logo.
+  &__logo {
+    float: left;
+    margin: 0 50px 0 0;
+    padding: 0;
+
+    @include rtl() {
+      float: right;
+      margin: 0 0 0 10px;
+    }
+  }
+
+  // Logo image.
+  &__logo-image {
+    vertical-align: bottom;
+  }
+
+  // Wrapper for website name and slogan.
+  &__name-and-slogan {
+    float: left;
+  }
+
+  // The name of the website.
+  &__site-name {
+    @extend %h1;
+    margin: 0;
+  }
+
+  // The link around the name of the website.
+  &__site-link {
+    &:link,
+    &:visited {
+      color: color(text);
+      text-decoration: none;
+    }
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+
+  // The slogan (or tagline) of a website.
+  &__site-slogan {
+    margin: 0;
+  }
+
+  // The secondary menu (login, etc.)
+  &__secondary-menu {
+    float: right;
+
+    @include rtl() {
+      float: left;
+    }
+  }
+
+  // Wrapper for any blocks placed in the header region.
+  &__region {
+    // Clear the logo.
+    float: left;
+
+    .block {
+      float: left;
+    }
+
+    #search-block-form {
+      margin-right: 50px;
+
+      input[type='text'] {
+        float: left;
+        background: url('../images/bg-search.png') no-repeat;
+        width: 287px;
+        margin: 0;
+        border: 0;
+        font-size: 12px;
+        line-height: 15px;
+        padding: 6px 8px;
+      }
+
+      input[type='submit'] {
+        float: left;
+        width: 74px;
+        height: 26px;
+        padding: 0 0 5px;
+        margin: 0;
+        border: 0;
+        color: #fff;
+        text-shadow: 0 2px 1px rgba(103, 69, 13, 1);
+        font: bold 14px/23px Arial, Helvetica, sans-serif;
+        background: url('../images/btn-search.png') no-repeat;
+        cursor: pointer;
+      }
+
+      .form-item,
+      .form-actions {
+        margin-top: 9px;
+        float: left;
+      }
+    }
+
+    .block-block {
+
+      color: color('grey');
+      line-height: 16px;
+      font-size: font-size('xs');
+      line-height: 14px;
+
+      .tel {
+        color: color('yellow');
+        font-size: font-size('xxl');
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-family: $archive;
+
+        span {
+          color: color('blue');
+          font-size: font-size('l');
+        }
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+}
+
+#header-wrapper {
+  box-shadow: 0 0 10px color('grey');
+}
