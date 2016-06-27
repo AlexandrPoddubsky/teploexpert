@@ -136,3 +136,27 @@ function teploexpert_preprocess_comment(&$variables, $hook) {
   $variables['sample_variable'] = t('Lorem ipsum.');
 }
 // */
+
+function teploexpert_uc_cart_block_summary($variables) {
+  $item_count = $variables['item_count'];
+  $item_text = $variables['item_text'];
+  $total = $variables['total'];
+  $summary_links = $variables['summary_links'];
+
+  // Build the basic table with the number of items in the cart and total.
+  $output = ''
+           . '<p>' . $item_text . '</td>'
+           . '<p><label>' . t('Total:')
+           . '</label> ' . theme('uc_price', array('price' => $total)) . '</p>';
+
+  // If there are products in the cart...
+  if ($item_count > 0) {
+    // Add a view cart link.
+    $output .= '<p>'
+             . theme('links', array('links' => $summary_links)) . '<p>';
+  }
+
+ // $output .= '</tbody></table>';
+
+  return $output;
+}
