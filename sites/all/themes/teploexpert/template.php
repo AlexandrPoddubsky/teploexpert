@@ -34,15 +34,11 @@ function teploexpert_preprocess_maintenance_page(&$variables, $hook) {
  * @param string $hook
  *   The name of the template being rendered ("html" in this case.)
  */
-/* -- Delete this line if you want to use this function
-function teploexpert_preprocess_html(&$variables, $hook) {
-  $variables['sample_variable'] = t('Lorem ipsum.');
 
-  // The body tag's classes are controlled by the $classes_array variable. To
-  // remove a class from $classes_array, use array_diff().
-  $variables['classes_array'] = array_diff($variables['classes_array'],
-    array('class-to-remove')
-  );
+function teploexpert_preprocess_html(&$variables, $hook) {
+ if(array_search('uc-product-node', $variables['classes_array'])){
+  $variables['classes_array'] = array_diff($variables['classes_array'], array('one-sidebar sidebar-first'));
+  }
 }
 // */
 
@@ -54,9 +50,11 @@ function teploexpert_preprocess_html(&$variables, $hook) {
  * @param string $hook
  *   The name of the template being rendered ("page" in this case.)
  */
-/* -- Delete this line if you want to use this function
+
 function teploexpert_preprocess_page(&$variables, $hook) {
-  $variables['sample_variable'] = t('Lorem ipsum.');
+  if (isset($variables['node']) && uc_product_is_product($variables['node'])) {
+    $variables['theme_hook_suggestions'][] = 'page__product';
+  }
 }
 // */
 
@@ -110,15 +108,19 @@ function teploexpert_preprocess_block(&$variables, $hook) {
  * @param string $hook
  *   The name of the template being rendered ("node" in this case.)
  */
-/* -- Delete this line if you want to use this function
+
 function teploexpert_preprocess_node(&$variables, $hook) {
   $variables['sample_variable'] = t('Lorem ipsum.');
-
+  $node = $variables['node'];
   // Optionally, run node-type-specific preprocess functions, like
   // teploexpert_preprocess_node_page() or teploexpert_preprocess_node_story().
-  $function = __FUNCTION__ . '_' . $variables['node']->type;
+  if (uc_product_is_product($node)) {
+    $variables['theme_hook_suggestions'][] = 'node__product';
+    $variables['theme_hook_suggestions'][] = 'node__product__' . $variables['view_mode'];
+    $function = __FUNCTION__ . '_product';
   if (function_exists($function)) {
     $function($variables, $hook);
+  }
   }
 }
 // */

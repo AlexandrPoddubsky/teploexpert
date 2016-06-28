@@ -117,14 +117,15 @@ a:hover {
 
 h1,
 .header__site-name {
-  font-size: 2.46154rem;
+  font-size: 1.69231rem;
   line-height: 3.69231rem;
   margin-top: 1.84615rem;
   margin-bottom: 1.84615rem;
+  text-transform: uppercase;
 }
 
 h2 {
-  font-size: 1.84615rem;
+  font-size: 1.69231rem;
   line-height: 2.76923rem;
   margin-top: 1.84615rem;
   margin-bottom: 1.84615rem;
@@ -2329,6 +2330,182 @@ aside .block-menu > .menu li:hover > ul {
 .block-facetapi a {
   text-decoration: none;
   color: #000;
+}
+
+.main-info {
+  overflow: hidden;
+}
+
+.main-info .field-name-uc-product-image {
+  float: left;
+  margin-right: 30px;
+}
+
+.main-info .info-pane h1 {
+  line-height: 1.69231rem;
+  margin-top: 0;
+}
+
+.main-info .info-pane .info-fields {
+  float: left;
+}
+
+.main-info .info-pane .info-fields > * {
+  margin-bottom: 20px;
+}
+
+.main-info .info-pane .info-fields .field-name-field-sku {
+  color: #939393;
+  font-style: italic;
+}
+
+.main-info .info-pane .info-fields .display-price {
+  float: none;
+  text-align: left;
+  font-size: 2.46154rem;
+}
+
+.main-info .info-pane .info-fields .add-to-cart input {
+  width: 125px;
+  height: 33px;
+  background: url("../images/btn-buy.png") no-repeat;
+  text-indent: -9999px;
+  border: 0;
+  outline: none;
+}
+
+.main-info .info-pane .box2 {
+  float: right;
+  border-left: 1px dotted #000;
+}
+
+.main-info .info-pane .box2 ul {
+  margin: 0;
+}
+
+.main-info .info-pane .box2 ul .delivery {
+  background: url("../images/bg-tools.png") no-repeat 0 2px;
+}
+
+.main-info .info-pane .box2 ul .order {
+  background: url("../images/bg-tools.png") no-repeat 0 -65px;
+}
+
+.main-info .info-pane .box2 ul .print {
+  background: url("../images/bg-tools.png") no-repeat 0 -140px;
+  padding-bottom: 20px;
+}
+
+.main-info .info-pane .box2 ul .montaz {
+  background: url("../images/bg-tools.png") no-repeat 0 -212px;
+}
+
+.main-info .info-pane .box2 ul .montaz .tools-drop {
+  top: -67px;
+}
+
+.main-info .info-pane .box2 ul .montaz .tools-drop .corner {
+  top: 77px;
+}
+
+.main-info .info-pane .box2 li {
+  list-style: none;
+  padding-left: 50px;
+  position: relative;
+}
+
+.main-info .info-pane .box2 li .strong {
+  color: #ff9c00;
+  text-transform: uppercase;
+  border-bottom: 1px dashed #ff9c00;
+  font-weight: bold;
+}
+
+.main-info .info-pane .box2 li .strong.tel {
+  color: #22c1f0;
+  border-bottom: 0;
+}
+
+.main-info .info-pane .box2 li p {
+  color: #939393;
+  margin: 0;
+}
+
+.main-info .info-pane .box2 li .tools-drop {
+  display: none;
+  top: -14px;
+  left: -323px;
+  position: absolute;
+  width: 300px;
+  min-height: 268px;
+  padding: 18px 20px;
+  box-shadow: 1px 1px 10px rgba(50, 50, 50, 0.5);
+  background: #fff;
+  z-index: 99;
+  font-size: 13px;
+  line-height: 17px;
+  font-style: italic;
+  border-radius: 10px;
+}
+
+.main-info .info-pane .box2 li .tools-drop p {
+  color: #000;
+}
+
+.main-info .info-pane .box2 li .tools-drop .corner {
+  background: url("../images/bg-corner.png") no-repeat;
+  width: 45px;
+  height: 48px;
+  overflow: hidden;
+  text-indent: -9999px;
+  position: absolute;
+  left: 285px;
+  top: 27px;
+}
+
+.main-info .info-pane .box2 li a {
+  text-decoration: none;
+  color: #ff9c00;
+}
+
+.main-info .info-pane .box2 li:hover .tools-drop {
+  display: block;
+}
+
+.main-info .info-pane .box2 .social-widget {
+  margin-left: 20px;
+}
+
+.chapter {
+  border-top: 1px solid black;
+  overflow: hidden;
+  padding: 20px 0;
+}
+
+.chapter .chapter-title {
+  float: left;
+  width: 250px;
+  margin: 0 20px 0 0;
+  color: #000;
+  text-transform: uppercase;
+  font-family: Tahoma, Verdana, "DejaVu Sans", sans-serif;
+  font-size: 1.53846rem;
+}
+
+.chapter .fields {
+  float: left;
+  max-width: 65%;
+  color: #939393;
+}
+
+.chapter .fields .field-label {
+  width: 222px;
+  font-weight: 100;
+  display: inline-block;
+}
+
+.chapter .fields .field-item {
+  font-weight: bold;
 }
 
 /*# sourceMappingURL=styles.css.map */
