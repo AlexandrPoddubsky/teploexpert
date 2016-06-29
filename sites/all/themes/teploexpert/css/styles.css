@@ -146,14 +146,14 @@ h4 {
 }
 
 h5 {
-  font-size: 1.07692rem;
+  font-size: 0.84615rem;
   line-height: 1.84615rem;
   margin-top: 1.84615rem;
   margin-bottom: 1.84615rem;
 }
 
 h6 {
-  font-size: 0.84615rem;
+  font-size: 0.69231rem;
   line-height: 1.84615rem;
   margin-top: 1.84615rem;
   margin-bottom: 1.84615rem;
@@ -200,12 +200,12 @@ mark {
 }
 
 small {
-  font-size: 1.07692rem;
+  font-size: 0.84615rem;
 }
 
 sub,
 sup {
-  font-size: 0.84615rem;
+  font-size: 0.69231rem;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
@@ -902,7 +902,7 @@ th {
 .header__region .block-block {
   color: #939393;
   line-height: 16px;
-  font-size: 0.84615rem;
+  font-size: 0.69231rem;
   line-height: 14px;
 }
 
@@ -1389,7 +1389,7 @@ span.field-label {
 
 .tabs--secondary {
   margin-top: 1.84615rem;
-  font-size: 1.07692rem;
+  font-size: 0.84615rem;
   background-image: none;
 }
 
@@ -1556,7 +1556,7 @@ span.field-label {
 
 .form-item__description,
 .form-item .description {
-  font-size: 1.07692rem;
+  font-size: 0.84615rem;
 }
 
 .form-item--inline div,
@@ -2003,8 +2003,12 @@ tr.drag-previous {
   width: 150px;
 }
 
-.installation-box .hover-box.hover {
+.installation-box .hover-box:hover {
   background-position: 0 -241px;
+}
+
+.installation-box .hover-box:hover .box-menu {
+  display: block;
 }
 
 .installation-box .box-menu-before {
@@ -2359,6 +2363,11 @@ aside .block-menu > .menu li:hover > ul {
   font-style: italic;
 }
 
+.main-info .info-pane .info-fields .fast-links a {
+  text-decoration: none;
+  border-bottom: 1px dashed #22c1f0;
+}
+
 .main-info .info-pane .info-fields .display-price {
   float: none;
   text-align: left;
@@ -2429,6 +2438,7 @@ aside .block-menu > .menu li:hover > ul {
 .main-info .info-pane .box2 li p {
   color: #939393;
   margin: 0;
+  font-size: 0.84615rem;
 }
 
 .main-info .info-pane .box2 li .tools-drop {
@@ -2506,6 +2516,14 @@ aside .block-menu > .menu li:hover > ul {
 
 .chapter .fields .field-item {
   font-weight: bold;
+}
+
+.readmore {
+  clear: both;
+  margin-left: 270px;
+  color: #22c1f0;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=styles.css.map */

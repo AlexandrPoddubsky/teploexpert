@@ -18,8 +18,29 @@
   Drupal.behaviors.my_custom_behavior = {
     attach: function (context, settings) {
 
-      // Place your code here.
+      // Show more
+      var cutText = '.desc, .specs, .taxonomy-term-description';
+      var cutter = '.cutter, .specs .field:nth-child(5)';
+      $('.desc .fields p').each(function () {
+        if ($(this).html() === '<!--break-->') {
+          $(this).addClass('cutter');
+        }
+      });
+      $(cutText).append('<div class="readmore show-more">Показать все</div>');
+      $(cutter).nextAll().hide();
 
+      $('.readmore').click(function () {
+        if ($(this).hasClass('show-more')) {
+          $(this).text('Скрыть');
+          $(this).parent().children().find(cutter).nextAll().show(200);
+        }
+        else {
+          $(this).text('Показать все');
+          $(this).parent().children().find(cutter).nextAll().hide(200);
+        }
+        $(this).toggleClass('show-less show-more');
+      });
+      // End of show more
     }
   };
 

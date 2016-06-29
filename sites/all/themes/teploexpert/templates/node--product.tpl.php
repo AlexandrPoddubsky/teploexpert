@@ -27,6 +27,9 @@
       <div class="info-fields">
       <?php
         print render($content['field_sku']);
+        ?>
+        <div class="fast-links"><a href="#features">Характеристики</a>&nbsp;&nbsp;<a href="#descr">Описание</a></div>
+        <?php
         print render($content['display_price']);
         ?>
         <div class="payment-box">
@@ -82,15 +85,15 @@ charset="utf-8"></script>
     hide($content['links']);
     hide($content['body']);
     ?>
-    <div class="chapter">
-    <div class="chapter-title">Характеристики</div>
+    <div class="chapter specs">
+    <div class="chapter-title" id="features">Характеристики</div>
     <div class="fields">
     <?php
     print render($content);
   ?>
   </div></div>
-  <div class="chapter">
-    <div class="chapter-title">Описание</div>
+  <div class="chapter desc">
+    <div class="chapter-title" id="descr">Описание</div>
     <div class="fields">
     <?php
     //unset $content['body']['#title'];

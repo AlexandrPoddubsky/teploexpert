@@ -26,6 +26,13 @@
         font-style: italic;
       }
 
+      .fast-links {
+        a {
+          text-decoration: none;
+          border-bottom: 1px dashed color('blue');
+        }
+      }
+
       .display-price {
         float: none;
         text-align: left;
@@ -96,6 +103,7 @@
         p {
           color: color('grey');
           margin: 0;
+          font-size: font-size('s');
         }
 
         .tools-drop {

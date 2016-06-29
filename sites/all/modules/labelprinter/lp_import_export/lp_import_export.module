@@ -35,10 +35,12 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
   if((empty($row['field_category']) || !isset($categories[$row['field_category']])) &&  ($row['type']!='Модификации' && $row['type']!='Аксессуар')){
     $err_cat = true;
   }
+    if ($err_vend) {
+      $context['results']['nobrand'][] = "{$row['model']}" . ' : ' . "{$row['field_brand'] }";
+    }
     $error = empty($row['model'])
       || empty($row['type']) || !isset($types[$row['type']])
-      || $err_cat
-      || $err_vend;
+      || $err_cat;
     if ($error) {
       $context['results']['ignored'][] = "{$row['model']}";
      return;
@@ -85,7 +87,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           case 'term_reference_tree' :
             switch ($field) {
             case 'field_brand':
-              $node->field_brand[LANGUAGE_NONE][0]['tid'] = $vendors[$value];
+              if (!$err_vend) $node->field_brand[LANGUAGE_NONE][0]['tid'] = $vendors[$value];
               break;
             case 'field_category':
               $node->field_category[LANGUAGE_NONE][0]['tid'] = $categories[$value];
@@ -220,5 +222,10 @@ function lp_import_export_process_import_finished ($success, $results, $operatio
     drupal_set_message(t('The following SKUs were ignored (row. model): !ignored', array(
       '!ignored' => '<br />' . implode('<br />', $results['ignored']),
     )), 'error');
+  }
+  if (!empty($results['nobrand'])) {
+    drupal_set_message(t('The following SKUs has invalid brands (row. model): !nobrand', array(
+      '!nobrand' => '<br />' . implode('<br />', $results['nobrand']),
+    )), 'warning');
   }
 }

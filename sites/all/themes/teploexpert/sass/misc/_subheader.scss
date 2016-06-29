@@ -92,8 +92,12 @@
       width: 150px;
     }
 
-    &.hover {
+    &:hover {
       background-position: 0 -241px;
+
+      .box-menu {
+        display: block;
+      }
     }
   }
 
