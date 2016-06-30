@@ -2,6 +2,7 @@
 #subheader {
   height: 240px;
   background-image: url('../images/bg-body.png');
+  margin-top: 5px;
 
   .region-subheader {
     position: relative;
@@ -24,7 +25,6 @@
   z-index: 2;
   position: absolute;
   left: 225px;
-  top: -11px;
   height: 244px;
   width: 552px;
   background: url('../images/img-builder.png') no-repeat 100% 100%;
@@ -43,12 +43,15 @@
 
     .em {
       display: block;
-      margin: 0 0 17px;
+      margin: 0 0 12px;
       font-size: 14px;
+      font-style: italic;
     }
 
     ul {
       position: relative;
+      margin: 0;
+      padding: 0;
 
       li {
         list-style-type: none;
@@ -56,6 +59,7 @@
 
       a {
         text-decoration: underline;
+        color: color('bluelink');
 
         &:hover {
           text-decoration: none;
@@ -67,11 +71,17 @@
 }
 
 .installation-box {
-  top: -8px;
   left: -40px;
   position: absolute;
   height: 227px;
   width: 526px;
+
+  &:hover {
+
+    .box-menu {
+      display: block;
+    }
+  }
 
   .hover-box {
     height: 227px;
@@ -124,7 +134,7 @@
     position: absolute;
     top: 39px;
     right: -13px;
-    z-index: 5;
+    z-index: 55;
 
     ul {
       margin: 0 0 0 38px;
@@ -241,8 +251,10 @@
     }
 
     a {
-      display: none;
+      text-decoration: none;
+      border-bottom: 1px dashed color('blue');
     }
+
   }
 
   p a {
@@ -253,5 +265,17 @@
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .cart-block-arrow {
+    display: none;
+  }
+
+  .cart-block-title-bar {
+    padding: 0;
+  }
+
+  #cart-items {
+    display: none;
   }
 }

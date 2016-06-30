@@ -78,6 +78,7 @@ $arial:           Arial, Helvetica, 'Nimbus Sans L', sans-serif;
 $impact:          Impact, 'Arial Narrow', Helvetica, sans-serif;
 $archive:         'archiveregular', Arial, Helvetica, sans-serif;
 $djv-bold:        'dejavu_sanscondensed_bold', Arial, Helvetica, sans-serif;
+$calibri:         Calibri, Helvetica, sans-serif;
 
 // Monospace font stacks.
 // For an explanation of why "sans-serif" is at the end of this list, see
@@ -162,11 +163,11 @@ $zen-layouts: (
   m: (
     columns: 2,
     // The gutters in the layouts are larger on mobile.
-    gutters: 25px,
+    gutters: 40px,
   ),
   xl: (
     columns: 3,
-    gutters: 25px,
+    gutters: 40px,
   ),
 );
 

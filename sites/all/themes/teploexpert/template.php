@@ -139,6 +139,55 @@ function teploexpert_preprocess_comment(&$variables, $hook) {
 }
 // */
 
+function teploexpert_uc_cart_block_title($variables) {
+  $title = $variables['title'];
+  $icon_class = $variables['icon_class'];
+  $collapsible = $variables['collapsible'];
+  $collapsed = $variables['collapsed'];
+
+  $output = '';
+
+    $output .= '<a class="colorbox-inline" href="?width=500&height=500&inline=true#cart-items">' . $title . '</a>';
+
+  return $output;
+}
+
+function teploexpert_uc_cart_block_items($variables) {
+  $items = $variables['items'];
+  $class = $variables['collapsed'] ? 'cart-block-items collapsed' : 'cart-block-items';
+
+  // If there are items in the shopping cart...
+  if ($items) {
+    $output = '<table><tbody>';
+
+    // Loop through each item.
+    $row_class = 'odd';
+    foreach ($items as $item) {
+      // Add the basic row with quantity, title, and price.
+      $output .= '<tr class="' . $row_class . '"><td class="cart-block-item-qty">' . $item['qty'] . '</td>'
+                . '<td class="cart-block-item-title">' . $item['title'] . '</td>'
+                . '<td class="cart-block-item-price">' . theme('uc_price', array('price' => $item['price'])) . '</td></tr>';
+
+      // Add a row of description if necessary.
+      if ($item['desc']) {
+        $output .= '<tr class="' . $row_class . '"><td colspan="3" class="cart-block-item-desc">' . $item['desc'] . '</td></tr>';
+      }
+
+      // Alternate the class for the rows.
+      $row_class = ($row_class == 'odd') ? 'even' : 'odd';
+    }
+
+    $output .= '</tbody></table>';
+    $output .= '<p class="cbox-cart-links">' . theme('links', array('links' => $variables['summary_links'])) . '</p>';
+  }
+  else {
+    // Otherwise display an empty message.
+    $output = '<p class="' . $class . ' uc-cart-empty">' . t('There are no products in your shopping cart.') . '</p>';
+  }
+
+  return '<div id="cart-items">' . $output . '</div>';
+}
+
 function teploexpert_uc_cart_block_summary($variables) {
   $item_count = $variables['item_count'];
   $item_text = $variables['item_text'];
@@ -147,18 +196,34 @@ function teploexpert_uc_cart_block_summary($variables) {
 
   // Build the basic table with the number of items in the cart and total.
   $output = ''
-           . '<p>' . $item_text . '</td>'
+           . '<p>' . $item_text . '</p>'
            . '<p><label>' . t('Total:')
            . '</label> ' . theme('uc_price', array('price' => $total)) . '</p>';
 
-  // If there are products in the cart...
-  if ($item_count > 0) {
-    // Add a view cart link.
-    $output .= '<p>'
-             . theme('links', array('links' => $summary_links)) . '<p>';
+  return $output;
+}
+
+function teploexpert_uc_cart_block_content($variables) {
+  $help_text = $variables['help_text'];
+  $items = $variables['items'];
+  $item_count = $variables['item_count'];
+  $item_text = $variables['item_text'];
+  $total = $variables['total'];
+  $summary_links = $variables['summary_links'];
+  $collapsed = $variables['collapsed'];
+
+  $output = '';
+
+  // Add the help text if enabled.
+  if ($help_text) {
+    $output .= '<span class="cart-help-text">' . $help_text . '</span>';
   }
 
- // $output .= '</tbody></table>';
+  // Add a table of items in the cart or the empty message.
+  $output .= theme('uc_cart_block_items', array('items' => $items, 'collapsed' => $collapsed, 'summary_links' => $summary_links));
+
+  // Add the summary section beneath the items table.
+  $output .= theme('uc_cart_block_summary', array('item_count' => $item_count, 'item_text' => $item_text, 'total' => $total, 'summary_links' => $summary_links));
 
   return $output;
 }

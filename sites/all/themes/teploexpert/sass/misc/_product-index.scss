@@ -38,6 +38,17 @@
       left: 35px;
     }
 
+    .views-field-uc-product-image {
+      height: 170px;
+      width: 170px;
+      line-height: 170px;
+      text-align: center;
+
+      img {
+        vertical-align: middle;
+      }
+    }
+
     .views-label {
       font-weight: 100;
     }
@@ -66,6 +77,29 @@
 
   a {
     text-decoration: none;
+    color: #000;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+}
+
+.taxonomy-term-description {
+  color: color('grey');
+  clear: both;
+
+  h2,
+  h3 {
+    font-family: $calibri;
+    text-transform: uppercase;
+    font-size: font-size('xl');
+    font-weight: normal;
     color: #000;
   }
 }

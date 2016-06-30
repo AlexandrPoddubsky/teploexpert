@@ -19,6 +19,7 @@ h1,
   @include margin-top(1, xl);
   @include margin-bottom(1, xl);
   text-transform: uppercase;
+  font-family: $djv-bold;
 }
 
 h2,

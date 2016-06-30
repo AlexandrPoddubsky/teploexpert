@@ -56,28 +56,7 @@
     <?php print render($page['subheader']); ?>
   </div>
   </div>
-  <div class="layout-center">
-  <div class="layout-3col layout-swap">
-
-    <?php
-      $content_class = 'layout-3col__full';
-    ?>
-
-    <main class="<?php print $content_class; ?>" role="main">
-      <?php print render($page['highlighted']); ?>
-      <?php print $breadcrumb; ?>
-      <a href="#skip-link" class="visually-hidden visually-hidden--focusable" id="main-content">Back to top</a>
-      <?php print $messages; ?>
-      <?php print render($tabs); ?>
-      <?php print render($page['help']); ?>
-      <?php if ($action_links): ?>
-        <ul class="action-links"><?php print render($action_links); ?></ul>
-      <?php endif; ?>
-      <?php print render($page['content']); ?>
-      <?php print $feed_icons; ?>
-    </main>
-
-    <div class="layout-swap__top layout-3col__full">
+  <div class="layout-swap__top main-menu-wrapper">
 
       <a href="#skip-link" class="visually-hidden visually-hidden--focusable" id="main-menu" tabindex="-1">Back to top</a>
 
@@ -105,6 +84,25 @@
       <?php print render($page['navigation']); ?>
 
     </div>
+  <div class="layout-center">
+  <div class="layout-3col layout-swap">
+
+    <?php
+      $content_class = 'layout-3col__full';
+    ?>
+
+    <main class="<?php print $content_class; ?>" role="main">
+      <?php print render($page['highlighted']); ?>
+      <?php print $breadcrumb; ?>
+      <a href="#skip-link" class="visually-hidden visually-hidden--focusable" id="main-content">Back to top</a>
+      <?php print $messages; ?>
+      <?php print render($tabs); ?>
+      <?php print render($page['help']); ?>
+      <?php if ($action_links): ?>
+        <ul class="action-links"><?php print render($action_links); ?></ul>
+      <?php endif; ?>
+      <?php print render($page['content']); ?>
+    </main>
 
   </div>
 

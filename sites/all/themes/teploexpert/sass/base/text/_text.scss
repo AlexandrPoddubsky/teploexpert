@@ -243,3 +243,15 @@ sup {
 u {
   // Add your styles.
 }
+
+.field-name-body {
+  line-height: 20px;
+
+  li {
+    list-style-position: outside;
+  }
+
+  ul {
+    padding: 0;
+  }
+}

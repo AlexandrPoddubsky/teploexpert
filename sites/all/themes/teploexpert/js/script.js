@@ -26,7 +26,9 @@
           $(this).addClass('cutter');
         }
       });
-      $(cutText).append('<div class="readmore show-more">Показать все</div>');
+      if ($(cutText).children().find(cutter).length > 0) {
+        $(cutText).append('<div class="readmore show-more">Показать все</div>');
+      }
       $(cutter).nextAll().hide();
 
       $('.readmore').click(function () {

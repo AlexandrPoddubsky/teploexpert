@@ -9,12 +9,8 @@
 
 @media (min-width: 777px) {
   #kssref-layouts-layout-3column .kss-modifier__example {
-    padding-left: 12px;
-    padding-right: 13px;
-  }
-  [dir="rtl"] #kssref-layouts-layout-3column .kss-modifier__example {
-    padding-left: 13px;
-    padding-right: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 

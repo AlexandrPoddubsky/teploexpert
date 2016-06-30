@@ -11,6 +11,8 @@
 
 .breadcrumb,
 %breadcrumb {
+  color: color('blue');
+
   @media print {
     display: none;
   }
@@ -29,5 +31,9 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
+  }
+
+  a {
+    color: color('grey');
   }
 }

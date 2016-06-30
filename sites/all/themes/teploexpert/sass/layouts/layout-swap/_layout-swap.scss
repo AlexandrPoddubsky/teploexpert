@@ -22,8 +22,6 @@ $layout-swap-height: 2 * $base-line-height;
 
   &__top {
     @include respond-to(xs) {
-      position: absolute;
-      top: 0;
       height: $layout-swap-height;
       width: 100%;
     }
