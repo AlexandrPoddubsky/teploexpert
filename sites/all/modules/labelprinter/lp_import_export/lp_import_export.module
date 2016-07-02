@@ -28,6 +28,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
   global $user;
   $err_vend = false;
   $err_cat = false;
+  $tags_vocabulary = taxonomy_vocabulary_machine_name_load('tags');
   if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}
   if((empty($row['field_brand']) || !isset($vendors[$row['field_brand']])) && $row['type']!='Модификации'){
     $err_vend = true;
@@ -93,9 +94,10 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
               $node->field_category[LANGUAGE_NONE][0]['tid'] = $categories[$value];
               break;
             case 'field_tags':
-              $terms = preg_split('/\s*,\s*//*', $value);
+              $terms = explode(',', $value);
             $node->field_tags[LANGUAGE_NONE] = array();
             foreach ($terms as $term_name) {
+              $term_name = trim($term_name);
               if (!isset($tags[$term_name])) {
                 $term = taxonomy_get_term_by_name($term_name, 'tags');
                 if (empty($term)) {

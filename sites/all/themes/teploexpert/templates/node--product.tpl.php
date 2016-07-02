@@ -84,6 +84,7 @@ charset="utf-8"></script>
     hide($content['comments']);
     hide($content['links']);
     hide($content['body']);
+    hide($content['field_tags']);
     ?>
     <div class="chapter specs">
     <div class="chapter-title" id="features">Характеристики</div>
@@ -98,6 +99,13 @@ charset="utf-8"></script>
     <?php
     //unset $content['body']['#title'];
     print render($content['body'][0]['#markup']);
+  ?>
+  </div></div>
+  <div class="chapter tags">
+    <div class="chapter-title" id="tags">Метки</div>
+    <div class="fields">
+    <?php $content['field_tags']['#label_display'] = 'hidden';
+    print render($content['field_tags']);
   ?>
   </div></div>
 </article>
