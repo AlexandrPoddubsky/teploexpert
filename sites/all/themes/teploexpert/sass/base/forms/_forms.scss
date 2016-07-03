@@ -133,6 +133,9 @@ input {
 [type='time'],
 [type='number'] {
   @extend %text-form-element !optional;
+  background: linear-gradient(to bottom, rgba(228, 227, 226, 1) 0%, rgba(243, 243, 242, 1) 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .5) inset;
+  border: 0;
 }
 
 [type='range'] {

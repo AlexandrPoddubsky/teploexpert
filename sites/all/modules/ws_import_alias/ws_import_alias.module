@@ -1,0 +1,129 @@
+<?php
+/**
+ * Implements hook_munu()
+ */
+function ws_import_alias_menu() {
+  $items = array();
+  $items['admin/config/search'] = array(
+    'title' => t('Import paths'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ws_import_alias_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Generating form
+ */
+function ws_import_alias_form () {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => t('This form allows to import product paths.') . '<br />',
+  );
+  $form['products'] = array(
+    '#type' => 'file',
+    '#title' => t('Product data file'),
+    '#description' => t('File of XLS format.'),
+    '#upload_validators' => array('file_validate_extensions' => array('xls')),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+  return $form;
+}
+
+function ws_import_alias_form_validate($form, &$form_state) {
+  $name = $_FILES['files']['name']['products'];
+  if (empty($name)) {
+    form_set_error('products', t('Please select product data file.'));
+    return;
+  }
+  if (!preg_match('/\.(xls|XLS)$/', $name)) {
+    form_set_error('products', t('Unsupported file format.'));
+  }
+}
+
+/**
+ * Processing form submit
+ */
+function ws_import_alias_form_submit ($form, &$form_state) {
+  $tmp_name = $_FILES['files']['tmp_name']['products'];
+
+  require_once(libraries_get_path('phpexcel') . '/PHPExcel.php');
+  $objPHPExcel = PHPExcel_IOFactory::load($tmp_name);
+  $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+
+  if (count($sheetData) < 2) {
+    drupal_set_message(t('File is empty.'), 'error');
+    return;
+  }
+
+  $operations = array();
+  foreach ($sheetData as $i => $row) {
+    if ($i == 1) {
+      continue;
+    }
+
+    $row = array_combine(array('id', 'url'), $row);
+// From here ================================================================================
+    $operations[] = array('ws_import_alias_process_import', array($row));
+  //To here
+}
+$batch = array (
+  // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'ws_import_alias_process_import_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Импорт товаров',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Импорт товаров',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.'
+  );
+batch_set($batch);
+}
+
+/**
+ * Batch operation
+ */
+function ws_import_alias_process_import($row, &$context) {
+  if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}
+   $product = db_select('uc_products', 'p')
+      ->fields('p')
+      ->condition('p.model', $row['id'])
+      ->execute()->fetch();
+
+   $node = node_load($product->nid);
+   if (!empty($row['url'])) {
+    $url = trim($row['url'], '/');
+    $path = path_load(array('source' => 'node/' . $node->nid));
+    path_delete($path['pid']);
+    $path['alias'] = $url;
+    unset($path['pid']);
+    $new_path = array(
+      'source' => 'node/' . $node->nid,
+      'alias' => $url,
+      );
+    path_save($new_path);
+    }
+     if (!isset($context['results']['updated'])) {$context['results']['updated'] = 1;} else {$context['results']['updated']++;}
+  }
+
+
+function ws_import_alias_process_import_finished ($success, $results, $operations) {
+
+  drupal_set_message(t('@total products in file. @updated products were updated.', array(
+    '@total' => $results['total'],
+    '@updated' => $results['updated'],
+  )));
+}

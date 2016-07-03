@@ -19,16 +19,16 @@
     attach: function (context, settings) {
 
       // Show more
-      var cutText = '.desc, .specs, .taxonomy-term-description';
-      var cutter = '.cutter, .specs .field:nth-child(5)';
+      var cutText = '.desc, .specs, .taxonomy-term-description, .boxx';
+      var cutter = '.cutter, .specs .field:nth-child(5), .boxx li:nth-child(4)';
       $('.desc .fields p').each(function () {
         if ($(this).html() === '<!--break-->') {
           $(this).addClass('cutter');
         }
       });
-      if ($(cutText).children().find(cutter).length > 0) {
-        $(cutText).append('<div class="readmore show-more">Показать все</div>');
-      }
+
+      $(cutter).parent().parent().append('<div class="readmore show-more">Показать все</div>');
+
       $(cutter).nextAll().hide();
 
       $('.readmore').click(function () {

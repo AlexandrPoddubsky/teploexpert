@@ -1,0 +1,158 @@
+// Installation page and views styles
+// Views
+.view-install .views-row {
+  width: 30%;
+  margin: 0 20px 30px 0;
+  padding: 10px;
+  border: 1px solid color('border');
+  text-align: center;
+  float: left;
+
+  .field-name-field-image {
+    height: 170px;
+    line-height: 170px;
+
+    img {
+      vertical-align: middle;
+    }
+  }
+
+  h2 {
+    font-size: font-size('m');
+    margin: 0 0 10px;
+    line-height: font-size('m');
+    min-height: 30px;
+
+    a {
+      color: color('blue');
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+
+  ul.links {
+    margin: 0;
+    height: 7px;
+
+    li {
+      display: block;
+      padding: 0;
+    }
+
+    a {
+      color: transparent;
+      background-image: url('../images/read-more-btn.png');
+      display: block;
+      width: 125px;
+      height: 34px;
+      margin: 0 auto;
+      }
+    }
+
+}
+
+.view-install  .view-header {
+    background: url('../images/img35.jpg') no-repeat;
+    width: 665px;
+    height: 481px;
+    position: relative;
+    overflow: hidden;
+
+    .text-block {
+      position: absolute;
+      width: 483px;
+      top: 72px;
+      right: 24px;
+      color: #5e5e5e;
+
+      .strong {
+        display: block;
+        color: #000;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: normal;
+        margin: 0 0 20px;
+      }
+
+      p {
+        margin: 0 0 10px;
+        line-height: 20px;
+      }
+
+      ul {
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        margin: 0 0 22px;
+        padding: 0;
+
+        li {
+          color: #000;
+          vertical-align: top;
+          display: inline-block;
+          width: 90px;
+          padding: 75px 0 0;
+          background: url('../images/bg-features.png') no-repeat;
+
+          &.box1 {
+            background-position: 4px 0;
+            width: 75px;
+          }
+
+          &.box2 {
+            background-position: -93px 0;
+            width: 80px;
+          }
+
+          &.box3 {
+            background-position: -175px 0;
+            width: 120px;
+          }
+
+          &.box4 {
+            background-position: -285px 0;
+            width: 100px;
+          }
+
+          &.box5 {
+            background-position: -394px 0;
+          }
+        }
+      }
+    }
+
+}
+
+//Mount node styles
+.node-type-instalation {
+
+  .field-name-body {
+    color: color('grey-dark');
+  }
+
+  .field-name-field-image {
+    float: left;
+    margin: 20px 20px 20px 0;
+  }
+
+  // form styles
+  form {
+    label {
+      width: 100px;
+      display: inline-block;
+    }
+
+    input[type='submit'] {
+      border: 0;
+      border-radius: 5px;
+      background: linear-gradient(color('yellow') + #111, color('yellow') - #111);
+      border-bottom: 3px solid color('yellow') - #333;
+      color: #fff;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
+}

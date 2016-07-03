@@ -280,3 +280,48 @@
     display: none;
   }
 }
+
+// Colorbox cart
+#colorbox {
+
+  #cart-items {
+
+    table {
+      font-weight: bold;
+    }
+
+    .links {
+      padding: 0;
+
+      li {
+        display: inline-block;
+        list-style: none;
+        border-radius: 5px;
+        padding: 10px;
+
+        a {
+          color: #fff;
+          text-transform: uppercase;
+          text-decoration: none;
+          font-weight: bold;
+        }
+
+        a:hover {
+          text-decoration: underline;
+        }
+
+        &.cart-block-view-cart {
+          background: linear-gradient(color('yellow') + #111, color('yellow') - #111);
+          border-bottom: 3px solid color('yellow') - #333;
+          margin-right: 50px;
+        }
+
+        &.cart-block-checkout {
+          background: linear-gradient(color('blue') + #111, color('blue') - #111);
+          border-bottom: 3px solid color('blue') - #333;
+          margin-right: 50px;
+        }
+      }
+    }
+  }
+}

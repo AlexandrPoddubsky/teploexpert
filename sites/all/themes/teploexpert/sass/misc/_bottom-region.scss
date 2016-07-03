@@ -1,0 +1,23 @@
+// bottom region styles
+
+.region-bottom {
+  background-image: url('../images/bg-body.png');
+  overflow: hidden;
+  color: color('grey');
+
+  &:before {
+    content: '';
+    display: block;
+    height: 1px;
+    box-shadow: 0 0 5px color('grey');
+  }
+
+  p {
+    margin: 8px 0;
+  }
+
+  .block {
+    width: $zen-grid-width;
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,4 @@
+name = WS Import Alias
+description = Imports Product URL aliases
+package = WellSolutions
+core = 7.x

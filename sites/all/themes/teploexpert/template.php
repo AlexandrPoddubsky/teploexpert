@@ -55,6 +55,11 @@ function teploexpert_preprocess_page(&$variables, $hook) {
   if (isset($variables['node']) && uc_product_is_product($variables['node'])) {
     $variables['theme_hook_suggestions'][] = 'page__product';
   }
+  if (drupal_is_front_page()) {
+  if (isset($variables['page']['content']['system_main'])) {
+    unset($variables['page']['content']['system_main']);
+  }
+}
 }
 // */
 
@@ -147,7 +152,7 @@ function teploexpert_uc_cart_block_title($variables) {
 
   $output = '';
 
-    $output .= '<a class="colorbox-inline" href="?width=500&height=500&inline=true#cart-items">' . $title . '</a>';
+    $output .= '<a class="colorbox-inline" href="?width=500&height=300&inline=true#cart-items">' . $title . '</a>';
 
   return $output;
 }
@@ -226,4 +231,27 @@ function teploexpert_uc_cart_block_content($variables) {
   $output .= theme('uc_cart_block_summary', array('item_count' => $item_count, 'item_text' => $item_text, 'total' => $total, 'summary_links' => $summary_links));
 
   return $output;
+}
+
+/**
+ * Remove counts from facets
+ */
+function teploexpert_facetapi_link_inactive($variables) {
+  // Builds accessible markup.
+  // @see http://drupal.org/node/1316580
+  $accessible_vars = array(
+    'text' => $variables['text'],
+    'active' => FALSE,
+  );
+  $accessible_markup = theme('facetapi_accessible_markup', $accessible_vars);
+
+  // Sanitizes the link text if necessary.
+  $sanitize = empty($variables['options']['html']);
+  $variables['text'] = ($sanitize) ? check_plain($variables['text']) : $variables['text'];
+
+  // Resets link text, sets to options to HTML since we already sanitized the
+  // link text and are providing additional markup for accessibility.
+  $variables['text'] .= $accessible_markup;
+  $variables['options']['html'] = TRUE;
+  return theme_link($variables);
 }
