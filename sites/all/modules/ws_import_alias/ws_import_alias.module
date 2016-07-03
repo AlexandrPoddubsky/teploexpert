@@ -4,7 +4,7 @@
  */
 function ws_import_alias_menu() {
   $items = array();
-  $items['admin/config/search'] = array(
+  $items['admin/config/search/import'] = array(
     'title' => t('Import paths'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ws_import_alias_form'),
