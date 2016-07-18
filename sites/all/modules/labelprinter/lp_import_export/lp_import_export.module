@@ -67,6 +67,20 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
     foreach ($row as $field => $value) {
       if(!empty($value)){
         switch ($fields[$field]['type']) {
+          case 'meta':
+            switch ($field) {
+            case 'meta_title':
+              $node->metatags['ru']['title']['value'] = $value;
+              break;
+            case 'meta_description':
+              $node->metatags['ru']['description']['value'] = $value;
+              break;
+
+            default:
+
+              break;
+          }
+          break;
           case 'raw':
             if ($field != 'type') $node->$field = $value;
             break;

@@ -210,6 +210,24 @@ function lp_export_form_submit($form_id, &$form_state) {
     $j = 0;
     foreach ($fields as $field => $field_info) {
       switch ($field_info['type']) {
+        case 'meta':
+          if (empty($node->metatags)) {
+            $value = null;
+            break;
+          }
+          switch ($field) {
+            case 'meta_title':
+              $value = isset($node->metatags['ru']['title']['value']) ? $node->metatags['ru']['title']['value']: null;
+              break;
+            case 'meta_description':
+              $value = isset($node->metatags['ru']['description']['value']) ? $node->metatags['ru']['description']['value']: null;
+              break;
+
+            default:
+
+              break;
+          }
+        break;
         case 'raw':
         if ($field == 'type') {
           $value = $node_types[$node->type]->name; }
@@ -303,6 +321,14 @@ function lp_import_export_get_fields($type) {
     'original_currency' => array(
       'label' => t('Currency'),
       'type' => 'raw',
+      ),
+    'meta_title' => array(
+      'label' => t('meta_title'),
+      'type' => 'meta',
+      ),
+    'meta_description' => array(
+      'label' => t('meta_description'),
+      'type' => 'meta',
       ),
     );
   foreach ($common_fields as $field => $value) {
