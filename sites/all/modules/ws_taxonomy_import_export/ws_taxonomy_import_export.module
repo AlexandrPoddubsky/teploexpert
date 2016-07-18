@@ -1,0 +1,302 @@
+<?php
+/**
+ * Implements hook_munu()
+ */
+function ws_taxonomy_import_export_menu() {
+  $items = array();
+  $items['admin/content/taxonomy-import'] = array(
+    'title' => t('Import taxonomy'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ws_taxonomy_import_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/content/taxonomy-export'] = array(
+    'title' => t('Export taxonomy'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ws_taxonomy_export_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Generating export form
+ */
+
+function ws_taxonomy_export_form() {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => t('This form allows to export taxonomy terms.') . '<br />',
+  );
+  $vocabularies = taxonomy_get_vocabularies();
+  $types = array();
+  foreach ($vocabularies as $voc) {
+    $types[$voc->machine_name] = $voc->name;
+  }
+  $form['types'] = array(
+    '#type' => 'radios',
+    '#title' => t('Product types'),
+    '#options' => $types,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Export'),
+  );
+  return $form;
+}
+
+/**
+ * Processing export
+ */
+
+function ws_taxonomy_export_form_submit ($form, &$form_state) {
+  $type = $form_state['values']['types'];
+  if (empty($type)) {
+    drupal_set_message(t('No vocabularies were selected'), 'error');
+    return;
+  }
+  $vid = taxonomy_vocabulary_machine_name_load($type)->vid;
+  $terms = taxonomy_get_tree($vid, 0, NULL, TRUE);
+
+  require_once(libraries_get_path('phpexcel') . '/PHPExcel.php');
+  $objPHPExcel = new PHPExcel();
+
+  $fields = ws_taxonomy_get_fields($type);
+  $node_types = node_type_get_types();
+
+  $j = 0;
+  foreach ($fields as $field) {
+    $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($j, 1, $field['label']);
+    $j++;
+  }
+
+  $i = 2;
+  foreach ($terms as $term) {
+    $j = 0;
+    foreach ($fields as $field => $field_info) {
+      switch ($field_info['type']) {
+        case 'meta':
+          if (empty($node->metatags)) {
+            $value = null;
+            break;
+          }
+          switch ($field) {
+            case 'meta_title':
+              $value = isset($term->metatags['und']['title']['value']) ? $term->metatags['und']['title']['value']: null;
+              break;
+            case 'meta_description':
+              $value = isset($term->metatags['und']['description']['value']) ? $term->metatags['und']['description']['value']: null;
+              break;
+
+            default:
+
+              break;
+          }
+        break;
+        case 'raw':
+        if ($field == 'type') {
+          $value = $term->vocabulary_machine_name; }
+          else
+          $value = isset($term->$field) ? $term->$field: null;
+          break;
+        case 'text_textarea_with_summary':
+        case 'text_textfield':
+        case 'options_buttons':
+        case 'number':
+        if (empty($term->$field)) {
+            $value = null;
+            break;
+          }
+            $val_array = array();
+            foreach ($term->{$field}[LANGUAGE_NONE] as $val) {
+              $val_array[] = $val['value'];
+            }
+            $value = implode(';', $val_array);
+            break;
+
+        default:
+          $value = null;
+          break;
+      }
+
+      if (!empty($value)) {
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($j, $i, $value);
+      }
+      $j++;
+    }
+    $i++;
+  }
+
+  header('Content-Type: application/vnd.ms-excel');
+  header('Content-Disposition: attachment;filename="terms.xls"');
+
+  $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+  $objWriter->save('php://output');
+
+  exit;
+}
+
+/**
+ * Generating import form
+ */
+function ws_taxonomy_import_form () {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => t('This form allows to import taxonomy metatags.') . '<br />',
+  );
+  $vocabularies = taxonomy_get_vocabularies();
+  $types = array();
+  foreach ($vocabularies as $voc) {
+    $types[$voc->machine_name] = $voc->name;
+  }
+  $form['types'] = array(
+    '#type' => 'radios',
+    '#title' => t('Product types'),
+    '#options' => $types,
+  );
+  $form['terms'] = array(
+    '#type' => 'file',
+    '#title' => t('Taxonomy data file'),
+    '#description' => t('File of XLS format.'),
+    '#upload_validators' => array('file_validate_extensions' => array('xls')),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+  return $form;
+}
+
+function ws_taxonomy_import_form_validate($form, &$form_state) {
+  $name = $_FILES['files']['name']['terms'];
+  if (empty($name)) {
+    form_set_error('products', t('Please select taxonomy data file.'));
+    return;
+  }
+  if (!preg_match('/\.(xls|XLS)$/', $name)) {
+    form_set_error('products', t('Unsupported file format.'));
+  }
+}
+
+/**
+ * Processing import form submit
+ */
+function ws_taxonomy_import_form_submit ($form, &$form_state) {
+  $tmp_name = $_FILES['files']['tmp_name']['terms'];
+
+  require_once(libraries_get_path('phpexcel') . '/PHPExcel.php');
+  $objPHPExcel = PHPExcel_IOFactory::load($tmp_name);
+  $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+
+  if (count($sheetData) < 2) {
+    drupal_set_message(t('File is empty.'), 'error');
+    return;
+  }
+  $type = $form_state['values']['types'];
+  $fields = ws_taxonomy_get_fields($type);
+  $operations = array();
+  foreach ($sheetData as $i => $row) {
+    if ($i == 1) {
+      continue;
+    }
+
+    $row = array_combine(array_keys($fields), $row);
+// From here ================================================================================
+    $operations[] = array('ws_taxonomy_import_export_process_import', array($row));
+  //To here
+}
+$batch = array (
+  // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'ws_taxonomy_import_export_process_import_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Импорт таксономии',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Импорт таксономии',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.'
+  );
+batch_set($batch);
+}
+
+/**
+ * Batch operation
+ */
+function ws_taxonomy_import_export_process_import($row, &$context) {
+  if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}
+
+   $term = taxonomy_term_load($row['tid']);
+   if (empty($term)) {
+      $context['results']['ignored'][] = "{$row['tid']}";
+     return;
+    }
+   if (!empty($row['meta_title'])) {
+    $term->metatags['und']['title']['value'] = $row['meta_title'];
+    }
+   if (!empty($row['meta_description'])) {
+    $term->metatags['und']['description']['value'] = $row['meta_description'];
+    }
+   taxonomy_term_save($term);
+     if (!isset($context['results']['updated'])) {$context['results']['updated'] = 1;} else {$context['results']['updated']++;}
+  }
+
+
+function ws_taxonomy_import_export_process_import_finished ($success, $results, $operations) {
+
+  drupal_set_message(t('@total products in file. @updated products were updated.', array(
+    '@total' => $results['total'],
+    '@updated' => $results['updated'],
+  )));
+  if (!empty($results['ignored'])) {
+    drupal_set_message(t('The following terms were ignored (row. tidl): !ignored', array(
+      '!ignored' => '<br />' . implode('<br />', $results['ignored']),
+    )), 'error');
+  }
+}
+
+/**
+ * Gathering taxonomy fields
+ */
+
+function ws_taxonomy_get_fields ($type) {
+  $common_fields = field_info_instances('taxonomy_term', $type);
+  $fields = array(
+    'tid' => array(
+      'label' => 'ID',
+      'type' => 'raw',
+      ),
+    'name' => array(
+      'label' => t('Title'),
+      'type' => 'raw',
+      ),
+    'type' => array(
+      'label' => t('Type'),
+      'type' => 'raw',
+      ),
+    'meta_title' => array(
+      'label' => t('meta_title'),
+      'type' => 'meta',
+      ),
+    'meta_description' => array(
+      'label' => t('meta_description'),
+      'type' => 'meta',
+      ),
+    );
+  foreach ($common_fields as $field => $value) {
+    $fields[$field] = array(
+        'label' => $value['label'],
+        'type' => $value['widget']['type'],
+        'module' => $value['widget']['module'],
+      );
+  }
+  return $fields;
+}

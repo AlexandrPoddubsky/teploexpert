@@ -1,0 +1,4 @@
+name = WS Taxonomy Import/Export
+description = Taxonomy metatags import and export
+package = WellSolutions
+core = 7.x

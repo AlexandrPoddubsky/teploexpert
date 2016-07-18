@@ -29,8 +29,6 @@ function lp_import_form() {
 }
 
 function lp_export_form() {
-  //dpm(field_info_instances('node', 'boiler'));
-  //dpm(lp_import_export_get_fields());
   $form = array();
   $form['description'] = array(
     '#markup' => t('This form allows to export product data.') . '<br />',
@@ -339,23 +337,6 @@ function lp_import_export_get_fields($type) {
       );
   }
   return $fields;
-
-  /*return array(
-    'model' => t('SKU'),
-    'title' => t('Title'),
-    'type' => t('Type'),
-    'field_availability' => t('Availability'),
-    'category' => t('Category'),
-    'vendor' => t('Vendor'),
-    'original_price' => t('Price'),
-    'original_currency' => t('Currency'),
-    'body' => t('Description'),
-    'field_tags' => t('Tags'),
-    'url' => t('URL'),
-    'field_recommended' => t('Recommended products'),
-    'field_similar' => t('Similar products'),
-    'field_accessories' => t('Accessories'),
-  );*/
 }
 
 function lp_import_export_get_related_fields() {
