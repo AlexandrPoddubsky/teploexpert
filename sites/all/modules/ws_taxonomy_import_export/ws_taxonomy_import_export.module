@@ -245,6 +245,11 @@ function ws_taxonomy_import_export_process_import($row, &$context) {
    if (!empty($row['meta_description'])) {
     $term->metatags['und']['description']['value'] = $row['meta_description'];
     }
+   if (isset($row['description'])) {
+      if (!empty($row['description'])) {
+        $term->description = $row['description'];
+      }
+    }
    taxonomy_term_save($term);
      if (!isset($context['results']['updated'])) {$context['results']['updated'] = 1;} else {$context['results']['updated']++;}
   }
@@ -280,6 +285,10 @@ function ws_taxonomy_get_fields ($type) {
       ),
     'type' => array(
       'label' => t('Type'),
+      'type' => 'raw',
+      ),
+    'description' => array(
+      'label' => t('Description'),
       'type' => 'raw',
       ),
     'meta_title' => array(
