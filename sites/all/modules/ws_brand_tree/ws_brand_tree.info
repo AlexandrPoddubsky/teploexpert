@@ -1,0 +1,4 @@
+name = WS Brant Tree
+description = Automatically builds subtree of categories, attached to brand
+package = WellSolutions
+core = 7.x

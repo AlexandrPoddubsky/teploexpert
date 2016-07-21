@@ -101,6 +101,7 @@ charset="utf-8"></script>
     print render($content['body'][0]['#markup']);
   ?>
   </div></div>
+  <?php if (count($content['field_tags']) > 1): ?>
   <div class="chapter tags">
     <div class="chapter-title" id="tags">Метки</div>
     <div class="fields">
@@ -108,4 +109,5 @@ charset="utf-8"></script>
     print render($content['field_tags']);
   ?>
   </div></div>
+<?php endif; ?>
 </article>

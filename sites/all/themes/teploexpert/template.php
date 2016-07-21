@@ -255,3 +255,19 @@ function teploexpert_facetapi_link_inactive($variables) {
   $variables['options']['html'] = TRUE;
   return theme_link($variables);
 }
+/**
+ * Implements hook_page_alter(). For moving term description to the bottom
+ */
+function teploexpert_page_alter(&$page) {
+  $menu_item = menu_get_item();
+  if ($menu_item['path'] == 'taxonomy/term/%') {
+    $term = $menu_item['page_arguments'][0];
+
+      $main = &$page['content']['system_main'];
+      if (!empty($main['term_heading']['term']['description'])) {
+        $main['description'] = $main['term_heading']['term']['description'];
+        unset($main['term_heading']['term']['description']);
+      }
+
+  }
+}

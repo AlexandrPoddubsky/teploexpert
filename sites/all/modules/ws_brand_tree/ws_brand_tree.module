@@ -1,0 +1,113 @@
+<?php
+/**
+ * Implements hook_node_presave()
+ */
+
+function ws_brand_tree_node_presave($node) {
+ if (!empty($node->field_category) && !empty($node->field_brand)) {
+   $cat = $node->field_category['und'][0]['tid'];
+   $parents = taxonomy_get_parents_all($cat);
+   $reversed_parents = array_reverse($parents);
+   // Check if brand has children or not
+   $brand = $node->field_brand['und'][0]['tid'];
+   $i=1;
+   // If there are suitable brand children, attach them to the node
+   foreach ($reversed_parents as $cat_term) {
+    $trigger = 0;
+    $brand_children = taxonomy_get_children($brand);
+    if (!empty($brand_children)) {
+     foreach ($brand_children as $brand_child) {
+       if ($cat_term->name == $brand_child->name) {
+        $node->field_brand['und'][$i]['tid'] = $brand_child->tid;
+        $i++;
+        $trigger = 1;
+        $brand = $brand_child->tid;
+        break;
+       }
+     }
+   }
+     //If there are not suitable term, create it
+     if (!$trigger) {
+      $new_term = new StdClass;
+      $new_term->vid = 3;
+      $new_term->name = $cat_term->name;
+      $new_term->parent = $brand;
+      taxonomy_term_save($new_term);
+      $node->field_brand['und'][$i]['tid'] = $new_term->tid;
+      $i++;
+      //Drill tree deeper
+      $brand = $new_term->tid;
+     }
+   }
+ }
+}
+
+/**
+ * Implements hook_menu()
+ */
+function ws_brand_tree_menu() {
+  $items = array();
+  $items['admin/config/saerch/resave-products'] = array(
+    'title' => 'Пересохранить все товары',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ws_brand_tree_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+/**
+ * Generate form with button to resave all products
+ */
+function ws_brand_tree_form() {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => 'Эта кнопка заново сохраняет все товары, чтобы пересчитать ссылки и словарь брэндов. <br>Не пользуйтесь этой кнопкой, если не знаете, зачем она!',
+  );
+   $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Пересохранить все товары',
+  );
+  return $form;
+}
+/**
+ * Submitting form
+ */
+function ws_brand_tree_form_submit($form, &$form_state) {
+  $result = db_select('uc_products', 'u')->fields('u', array('nid'))->range(0, 20)->execute();
+  // Batch array
+  $operations = array();
+  foreach ($result as $product) {
+    $operations[] = array('ws_brand_tree_resave', array($product->nid));
+  }
+  $batch = array (
+  // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'ws_brand_tree_resave_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Пересохранение',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Пересохранение',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.'
+  );
+batch_set($batch);
+}
+/**
+ * Batch
+ */
+function ws_brand_tree_resave ($product, &$context) {
+  $node = node_load($product);
+  node_save($node);
+}
+
+function ws_brand_tree_resave_finished ($success, $results, $operations) {
+  drupal_set_message(t('Done.'));
+}
