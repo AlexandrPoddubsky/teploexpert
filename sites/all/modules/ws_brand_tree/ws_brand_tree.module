@@ -74,7 +74,7 @@ function ws_brand_tree_form() {
  * Submitting form
  */
 function ws_brand_tree_form_submit($form, &$form_state) {
-  $result = db_select('uc_products', 'u')->fields('u', array('nid'))->range(0, 20)->execute();
+  $result = db_select('uc_products', 'u')->fields('u', array('nid'))->execute();
   // Batch array
   $operations = array();
   foreach ($result as $product) {
