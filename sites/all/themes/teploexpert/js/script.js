@@ -19,7 +19,7 @@
     attach: function (context, settings) {
 
       // Show more
-      var cutText = '.desc, .specs, .taxonomy-term-description, .boxx';
+      // var cutText = '.desc, .specs, .taxonomy-term-description, .boxx';
       var cutter = '.cutter, .specs .field:nth-child(5), .boxx li:nth-child(4)';
       $('.desc .fields p, .taxonomy-term-description p').each(function () {
         if ($(this).html() === '<!--break-->') {

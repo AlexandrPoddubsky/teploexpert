@@ -2449,6 +2449,12 @@ aside .block-menu > .menu li:hover > ul {
   left: 35px;
 }
 
+.view-product-index .views-row .views-field-nid a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .view-product-index .views-row .views-field-uc-product-image {
   height: 170px;
   width: 170px;
@@ -2470,8 +2476,13 @@ aside .block-menu > .menu li:hover > ul {
 }
 
 .block-facetapi {
-  width: 33%;
+  width: 31%;
   float: left;
+  padding-right: 2%;
+}
+
+.block-facetapi:nth-child(3n+1) {
+  clear: left;
 }
 
 .block-facetapi .block__title {
@@ -2493,7 +2504,7 @@ aside .block-menu > .menu li:hover > ul {
 }
 
 .block-facetapi .range-box input {
-  width: 90px;
+  width: 82px;
 }
 
 .block-facetapi .range-box .form-item {
@@ -2503,6 +2514,11 @@ aside .block-menu > .menu li:hover > ul {
 .block-facetapi .range-slider-box {
   clear: both;
   padding: 20px 0;
+}
+
+.block-facetapi .range-slider-box .range-slider {
+  width: 90%;
+  margin: 0 auto;
 }
 
 .block-facetapi a {

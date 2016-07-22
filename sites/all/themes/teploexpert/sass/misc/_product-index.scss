@@ -36,6 +36,12 @@
       position: absolute;
       bottom: -17px;
       left: 35px;
+
+      a {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
     }
 
     .views-field-uc-product-image {
@@ -63,8 +69,13 @@
 
 //Facet filters
 .block-facetapi {
-  width: 33%;
+  width: 31%;
   float: left;
+  padding-right: 2%;
+
+  &:nth-child(3n+1) {
+    clear: left;
+  }
 
   .block__title {
     font-size: font-size('m');
@@ -84,7 +95,7 @@
     }
 
     input {
-      width: 90px;
+      width: 82px;
     }
 
     .form-item {
@@ -95,6 +106,11 @@
   .range-slider-box {
     clear: both;
     padding: 20px 0;
+
+    .range-slider {
+      width: 90%;
+      margin: 0 auto;
+    }
   }
 
   a {
