@@ -1,0 +1,37 @@
+// Checkout styles
+.address-pane-table:not(.yur) {
+
+  .field-billing_company,
+  .field-billing_ucxf_inn,
+  .field-billing_ucxf_kpp,
+  .field-billing_ucxf_checking_account,
+  .field-billing_ucxf_corr_account,
+  .field-billing_ucxf_bank,
+  .field-billing_ucxf_ogrn,
+  .field-billing_street2 {
+    display: none;
+  }
+}
+
+.address-pane-table {
+
+  tr {
+    background: none !important;
+    border: 0;
+
+    &.field-billing_last_name {
+
+      .form-item {
+
+        input {
+          width: 150px;
+          margin-right: 5px;
+        }
+      }
+    }
+
+    .field-label {
+      text-align: left !important;
+    }
+  }
+}

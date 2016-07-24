@@ -2,6 +2,8 @@
 .view-product-index {
   clear: both;
   margin-top: 20px;
+  overflow: hidden;
+  padding-top: 20px;
 
   .views-row {
     width: 30%;
@@ -73,7 +75,7 @@
   float: left;
   padding-right: 2%;
 
-  &:nth-child(3n+1) {
+  &:not(.brand-filter):nth-child(3n+1) {
     clear: left;
   }
 

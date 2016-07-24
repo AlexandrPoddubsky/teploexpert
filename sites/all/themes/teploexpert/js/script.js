@@ -43,6 +43,28 @@
         $(this).toggleClass('show-less show-more');
       });
       // End of show more
+
+      // Checking ownership
+      $('.ownership').change(function () {
+        var x = '';
+        $('.ownership').each(function () {
+          if ($(this).attr('checked')) {
+            x = ($(this).val());
+            if (x === 'Юридическое лицо') {
+              $('.address-pane-table').addClass('yur');
+            }
+            else {
+              $('.address-pane-table').removeClass('yur');
+            }
+            $('#edit-panes-billing-address-billing-ucxf-ownership option:selected').attr('selected', 'false');
+            $('#edit-panes-billing-address-billing-ucxf-ownership option').each(function () {
+              if ($(this).val() === x) {
+                $(this).attr('selected', 'selected');
+              }
+            });
+          }
+        });
+      });
     }
   };
 

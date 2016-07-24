@@ -2411,6 +2411,8 @@ aside .block-menu > .menu li:hover > ul {
 .view-product-index {
   clear: both;
   margin-top: 20px;
+  overflow: hidden;
+  padding-top: 20px;
 }
 
 .view-product-index .views-row {
@@ -2481,7 +2483,7 @@ aside .block-menu > .menu li:hover > ul {
   padding-right: 2%;
 }
 
-.block-facetapi:nth-child(3n+1) {
+.block-facetapi:not(.brand-filter):nth-child(3n+1) {
   clear: left;
 }
 
@@ -2996,6 +2998,31 @@ aside .block-menu > .menu li:hover > ul {
 
 .front .readmore {
   margin-left: 0;
+}
+
+.address-pane-table:not(.yur) .field-billing_company,
+.address-pane-table:not(.yur) .field-billing_ucxf_inn,
+.address-pane-table:not(.yur) .field-billing_ucxf_kpp,
+.address-pane-table:not(.yur) .field-billing_ucxf_checking_account,
+.address-pane-table:not(.yur) .field-billing_ucxf_corr_account,
+.address-pane-table:not(.yur) .field-billing_ucxf_bank,
+.address-pane-table:not(.yur) .field-billing_ucxf_ogrn,
+.address-pane-table:not(.yur) .field-billing_street2 {
+  display: none;
+}
+
+.address-pane-table tr {
+  background: none !important;
+  border: 0;
+}
+
+.address-pane-table tr.field-billing_last_name .form-item input {
+  width: 150px;
+  margin-right: 5px;
+}
+
+.address-pane-table tr .field-label {
+  text-align: left !important;
 }
 
 /*# sourceMappingURL=styles.css.map */

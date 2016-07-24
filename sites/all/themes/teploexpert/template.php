@@ -264,10 +264,9 @@ function teploexpert_page_alter(&$page) {
     $term = $menu_item['page_arguments'][0];
 
       $main = &$page['content']['system_main'];
-      if (!empty($main['term_heading']['term']['description'])) {
-        $main['description'] = $main['term_heading']['term']['description'];
-        unset($main['term_heading']['term']['description']);
-      }
+      $term_heading = $main['term_heading'];
+      unset($main['term_heading']);
+      $main['term_heading'] = $term_heading;
 
   }
 }
