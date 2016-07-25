@@ -3025,4 +3025,8 @@ aside .block-menu > .menu li:hover > ul {
   text-align: left !important;
 }
 
+.address-pane-table .field-billing_ucxf_ownership {
+  display: none;
+}
+
 /*# sourceMappingURL=styles.css.map */
