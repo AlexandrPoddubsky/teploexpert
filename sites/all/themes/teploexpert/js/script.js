@@ -65,6 +65,9 @@
           }
         });
       });
+      $(document).bind('cbox_complete', function () {
+        $('#cboxContent, #cboxLoadedContent').removeAttr('style');
+      });
     }
   };
 

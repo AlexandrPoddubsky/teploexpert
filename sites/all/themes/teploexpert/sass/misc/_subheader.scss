@@ -285,6 +285,7 @@
 #colorbox {
 
   #cart-items {
+    margin: 20px;
 
     table {
       font-weight: bold;
@@ -324,4 +325,52 @@
       }
     }
   }
+
+// Call me form
+
+article header {
+  padding: 0 20px;
+  overflow: hidden;
+  background: linear-gradient(color('blue') + #222, color('blue') -#222);
+
+  a {
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 1px 1px 2px color('blue') - #333;
+  }
+}
+
+form {
+  margin: 20px;
+
+    input {
+      width: 186px;
+    }
+
+    label {
+      display: inline-block;
+      width: 100px;
+      font-size: 1.3em;
+    }
+
+    .webform-submit {
+      color: #fff;
+      background: linear-gradient(color('yellow') + #222, color('yellow') - #222);
+      border: 0;
+      border-radius: 5px;
+      border-bottom: 3px solid color('yellow')-#333;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 1px color('yellow')-#333;
+      float: right;
+    }
+  }
+
+  #cboxTopLeft,
+    #cboxTopCenter,
+    #cboxTopRight,
+    #cboxMiddleLeft,
+    #cboxMiddleRight {
+      display: none;
+    }
 }

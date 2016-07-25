@@ -2274,6 +2274,10 @@ tr.drag-previous {
   display: none;
 }
 
+#colorbox #cart-items {
+  margin: 20px;
+}
+
 #colorbox #cart-items table {
   font-weight: bold;
 }
@@ -2312,6 +2316,54 @@ tr.drag-previous {
   background: linear-gradient(#33d2ff, #11b0df);
   border-bottom: 3px solid #008ebd;
   margin-right: 50px;
+}
+
+#colorbox article header {
+  padding: 0 20px;
+  overflow: hidden;
+  background: -webkit-linear-gradient(#44e3ff, #009fce);
+  background: linear-gradient(#44e3ff, #009fce);
+}
+
+#colorbox article header a {
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 1px 1px 2px #008ebd;
+}
+
+#colorbox form {
+  margin: 20px;
+}
+
+#colorbox form input {
+  width: 186px;
+}
+
+#colorbox form label {
+  display: inline-block;
+  width: 100px;
+  font-size: 1.3em;
+}
+
+#colorbox form .webform-submit {
+  color: #fff;
+  background: -webkit-linear-gradient(#ffbe22, #dd7a00);
+  background: linear-gradient(#ffbe22, #dd7a00);
+  border: 0;
+  border-radius: 5px;
+  border-bottom: 3px solid #cc6900;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 1px #cc6900;
+  float: right;
+}
+
+#colorbox #cboxTopLeft,
+#colorbox #cboxTopCenter,
+#colorbox #cboxTopRight,
+#colorbox #cboxMiddleLeft,
+#colorbox #cboxMiddleRight {
+  display: none;
 }
 
 aside .block-menu {
