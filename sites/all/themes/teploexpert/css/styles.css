@@ -2639,6 +2639,7 @@ aside .block-menu > .menu li:hover > ul {
 
 .main-info {
   overflow: hidden;
+  margin-top: 2em;
 }
 
 .main-info .field-name-uc-product-image {
