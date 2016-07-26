@@ -47,10 +47,17 @@ function ws_brand_tree_node_presave($node) {
  */
 function ws_brand_tree_menu() {
   $items = array();
-  $items['admin/config/saerch/resave-products'] = array(
+  $items['admin/config/search/resave-products'] = array(
     'title' => 'Пересохранить все товары',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ws_brand_tree_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/config/search/resave-brands'] = array(
+    'title' => 'Пересохранить все брэнды',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ws_brand_tree_brand_form'),
     'access arguments' => array('access administration pages'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -67,6 +74,21 @@ function ws_brand_tree_form() {
    $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Пересохранить все товары',
+  );
+  return $form;
+}
+
+/**
+ * Generate form with button to resave all brands
+ */
+function ws_brand_tree_brand_form() {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => 'Эта кнопка заново сохраняет все брэнды, чтобы пересчитать их ссылки. <br>Не пользуйтесь этой кнопкой, если не знаете, зачем она!',
+  );
+   $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Пересохранить все брэнды',
   );
   return $form;
 }
@@ -101,7 +123,7 @@ function ws_brand_tree_form_submit($form, &$form_state) {
 batch_set($batch);
 }
 /**
- * Batch
+ * Batch for nodes
  */
 function ws_brand_tree_resave ($product, &$context) {
   $node = node_load($product);
@@ -109,5 +131,62 @@ function ws_brand_tree_resave ($product, &$context) {
 }
 
 function ws_brand_tree_resave_finished ($success, $results, $operations) {
+  drupal_set_message(t('Done.'));
+}
+
+/**
+ * Submitting brand form
+ */
+function ws_brand_tree_brand_form_submit($form, &$form_state) {
+  $roots = taxonomy_get_tree(3, 0, 1, false);
+  $operations = array();
+  foreach ($roots as $root) {
+    $root_tid = $root->tid;
+    $root_alias = drupal_get_path_alias('taxonomy/term/' . $root_tid);
+    $root_children = taxonomy_get_tree(3, $root_tid, NULL, TRUE);
+    foreach ($root_children as $child) {
+      $operations[] = array('ws_brand_tree_brand_resave', array($root_alias, $child));
+    }
+  }
+  // Batch array
+  $batch = array (
+  // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'ws_brand_tree_brand_resave_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Пересохранение',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Пересохранение',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.'
+  );
+batch_set($batch);
+}
+
+/**
+ * Batch for terms
+ */
+function ws_brand_tree_brand_resave ($root_alias, $child, &$context) {
+  $name = $child->name;
+      $cats = taxonomy_get_term_by_name($name, 'categories');
+      $cat = array_pop($cats);
+      $tale = drupal_get_path_alias('taxonomy/term/' . $cat->tid);
+      $path = $root_alias . '/' . $tale;
+      path_delete(array('source' => 'taxonomy/term/' . $child->tid));
+      $path_array = array(
+        'source' => 'taxonomy/term/' . $child->tid,
+        'alias' => $path,
+        );
+      path_save($path_array);
+}
+
+function ws_brand_tree_brand_resave_finished ($success, $results, $operations) {
   drupal_set_message(t('Done.'));
 }
