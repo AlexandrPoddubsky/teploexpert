@@ -2637,6 +2637,16 @@ aside .block-menu > .menu li:hover > ul {
   color: #000;
 }
 
+.view-subcategories .views-row {
+  width: 50%;
+  float: left;
+}
+
+.view-subcategories .views-row a {
+  color: #ff9c00;
+  font-size: 1.1em;
+}
+
 .main-info {
   overflow: hidden;
   margin-top: 2em;

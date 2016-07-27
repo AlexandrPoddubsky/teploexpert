@@ -177,3 +177,16 @@
     color: #000;
   }
 }
+
+.view-subcategories {
+
+  .views-row {
+    width: 50%;
+    float: left;
+
+    a {
+      color: color('yellow');
+      font-size: 1.1em;
+    }
+  }
+}
