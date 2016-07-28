@@ -2366,6 +2366,14 @@ tr.drag-previous {
   display: none;
 }
 
+.webform-confirmation {
+  margin: 20px;
+}
+
+.webform-confirmation + .links {
+  display: none;
+}
+
 aside .block-menu {
   border-radius: 5px 5px 0 0;
   background-image: url("../images/bg-body.png");

@@ -374,3 +374,11 @@ form {
       display: none;
     }
 }
+
+.webform-confirmation {
+  margin: 20px;
+}
+
+.webform-confirmation + .links {
+  display: none;
+}
