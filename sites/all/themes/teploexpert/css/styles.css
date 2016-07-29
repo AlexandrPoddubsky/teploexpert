@@ -718,7 +718,7 @@ th {
   padding-left: 20px;
   padding-right: 20px;
   margin: 0 auto;
-  max-width: 1000px;
+  width: 1000px;
 }
 
 @media (min-width: 777px) {
@@ -931,6 +931,7 @@ th {
 
 #header-wrapper {
   box-shadow: 0 0 10px #939393;
+  min-width: 1000px;
 }
 
 .hidden,
@@ -1338,6 +1339,7 @@ span.field-label {
 .main-menu-wrapper {
   position: absolute;
   z-index: 50;
+  min-width: 1000px;
 }
 
 .pager {
