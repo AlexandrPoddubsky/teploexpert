@@ -152,7 +152,7 @@ function teploexpert_uc_cart_block_title($variables) {
 
   $output = '';
 
-    $output .= '<a class="colorbox-inline" href="?width=500&height=300&inline=true#cart-items">' . $title . '</a>';
+    $output .= '<a class="cart-link" href="/cart">' . $title . '</a>';
 
   return $output;
 }
