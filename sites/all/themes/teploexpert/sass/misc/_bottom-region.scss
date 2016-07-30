@@ -4,6 +4,7 @@
   background-image: url('../images/bg-body.png');
   overflow: hidden;
   color: color('grey');
+  min-width: 1000px;
 
   &:before {
     content: '';

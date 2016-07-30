@@ -71,7 +71,7 @@
     @include zen-grid-item(1, 1);
   }
 
-  @include zen-respond-to(m) {
+  /*@include zen-respond-to(m) {
     // Since our container's context is "flow" and we changed the gutter size,
     // we need to re-apply the container's negative left/right margins.
     @include zen-grid-container($context: flow);
@@ -105,7 +105,7 @@
       @include zen-grid-item(1, 2);
       @include zen-apply-gutter-padding();
     }
-  }
+  } */
 
   @include zen-respond-to(xl) {
     &__full {

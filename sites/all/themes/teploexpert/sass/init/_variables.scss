@@ -128,7 +128,7 @@ $rem-fallback:      false;
 @include add-breakpoint(s,    (666px, 'no-query' true));
 @include add-breakpoint(m,    (777px, 'no-query' true));
 @include add-breakpoint(l,    (888px, 'no-query' true));
-@include add-breakpoint(xl,   (999px, 'no-query' true));
+@include add-breakpoint(xl,   (299px, 'no-query' true));
 @include add-breakpoint(xxl,  (1111px));
 @include add-breakpoint(xxxl, (1222px));
 
@@ -187,7 +187,7 @@ $zen-rtl-selector: '[dir="rtl"]';
 
 $indent-amount: 2 * $base-font-size;
 
-$include-rtl: true;
+$include-rtl: false;
 // Automatically turn off Zen Grids' RTL support if $include-rtl is false.
 @if not $include-rtl {
   $zen-rtl-selector: false !global;
