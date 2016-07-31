@@ -2347,7 +2347,8 @@ aside .block-menu > .menu li:hover > ul {
   list-style: none;
 }
 
-.block-facetapi.brand-filter {
+.block-facetapi.brand-filter,
+.block-ws-brand-block {
   clear: both;
   float: none;
   width: auto;
@@ -2355,28 +2356,37 @@ aside .block-menu > .menu li:hover > ul {
   border-bottom: 1px solid #cccccc;
 }
 
-.block-facetapi.brand-filter .block__title {
+.block-facetapi.brand-filter .block__title,
+.block-ws-brand-block .block__title {
+  font-size: 1rem;
   font-family: Arial, Helvetica, "Nimbus Sans L", sans-serif;
   font-weight: normal;
   font-style: italic;
   color: #939393;
+  margin: 0;
 }
 
-.block-facetapi.brand-filter li {
+.block-facetapi.brand-filter li,
+.block-ws-brand-block li {
   display: inline-block;
   margin-right: 5px;
 }
 
-.block-facetapi.brand-filter li div {
+.block-facetapi.brand-filter li div,
+.block-ws-brand-block li div {
   display: inline;
 }
 
-.block-facetapi.brand-filter li a {
+.block-facetapi.brand-filter a,
+.block-ws-brand-block a {
   font-size: 16px;
   font-weight: bold;
+  color: #000;
+  text-decoration: none;
 }
 
-.block-facetapi.brand-filter li a:hover {
+.block-facetapi.brand-filter a:hover,
+.block-ws-brand-block a:hover {
   color: #ff9c00;
   text-decoration: underline;
 }

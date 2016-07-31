@@ -1,0 +1,37 @@
+<?php
+/**
+ * Implements hook_block_info()
+ */
+function ws_brand_block_block_info() {
+  $blocks['brand_links'] = array(
+    'info' => t('Производители'),
+    'cache' => DRUPAL_NO_CACHE,
+    'weight' => -56,
+    'region' => 'content',
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'taxonomy/term/*',
+    );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view()
+ */
+
+function ws_brand_block_block_view($delta) {
+  $block = array();
+  $current_page = menu_get_item();
+  if ($current_page['page_arguments'][0]->vid == 2) {
+    $name = $current_page['page_arguments'][0]->name;
+    $terms = taxonomy_get_term_by_name($name, 'brands');
+    $block['subject'] = 'Производители:';
+    $block['content'] = '';
+    foreach ($terms as $term) {
+      $tid = $term->tid;
+      $parents = taxonomy_get_parents_all($tid);
+      $vendor = array_pop($parents);
+      $block['content'] .= l($vendor->name, drupal_get_path_alias('taxonomy/term/' . $tid)) . ' ';
+    }
+  }
+  return $block;
+}

@@ -1,0 +1,4 @@
+name = WS Brand Block
+description = Shows block with links to brand subcategories
+package = WellSolutions
+core = 7.x
