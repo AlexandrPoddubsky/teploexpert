@@ -28,6 +28,8 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
   global $user;
   $err_vend = false;
   $err_cat = false;
+  $folder = drupal_realpath('public://import');
+  $ext = array('jpeg', 'jpg', 'png', 'gif');
   $tags_vocabulary = taxonomy_vocabulary_machine_name_load('tags');
   if (isset($context['results']['total'])) {$context['results']['total']++;}  else {$context['results']['total'] = 1;}
   if((empty($row['field_brand']) || !isset($vendors[$row['field_brand']])) && $row['type']!='Модификации'){
@@ -108,15 +110,18 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
               $node->field_category[LANGUAGE_NONE][0]['tid'] = $categories[$value];
               break;
             case 'field_tags':
+            case 'field_series':
+              $vocname = ($field == 'field_tags') ? 'tags' : 'series';
+              $vid = ($field == 'field_tags') ? 1 : 4;
               $terms = explode(',', $value);
-            $node->field_tags[LANGUAGE_NONE] = array();
+            $node->{$field}[LANGUAGE_NONE] = array();
             foreach ($terms as $term_name) {
               $term_name = trim($term_name);
               if (!isset($tags[$term_name])) {
-                $term = taxonomy_get_term_by_name($term_name, 'tags');
+                $term = taxonomy_get_term_by_name($term_name, $vocname);
                 if (empty($term)) {
                   $term = new stdClass;
-                  $term->vid = $tags_vocabulary->vid;
+                  $term->vid = $vid;
                   $term->name = $term_name;
                   taxonomy_term_save($term);
                 } else {
@@ -124,7 +129,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
                 }
                 $tags[$term_name] = $term->tid;
               }
-              $node->field_tags[LANGUAGE_NONE][] = array('tid' => $tags[$term_name]);
+              $node->{$field}[LANGUAGE_NONE][] = array('tid' => $tags[$term_name]);
             }
               break;
 
@@ -135,7 +140,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           break;
           case 'image_image':
             if (empty($node->uc_product_image)) {
-              $filepath = 'http://teploexpert.com' . $value;
+             /* $filepath = 'http://teploexpert.com' . $value;
               $mime_raw = explode('.', $value);
               $mime = array_pop($mime_raw);
               $land = 'public://'. $node->model . '.' . $mime;
@@ -150,7 +155,23 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
 
                 $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
                 break;
-              }
+              }*/
+              foreach ($ext as $val) {
+                $filepath = $folder . '/' . $node->model . '.' . $val;
+                if (file_exists($filepath)) {
+                  $file = new stdClass;
+                  $file->uid = $user->uid;
+                  $file->uri = $filepath;
+                  $file->filemime = file_get_mimetype($filepath);
+                  $file->status = 1;
+
+                  $file = file_copy($file, 'public://');
+                  file_unmanaged_delete($filepath);
+
+                  $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
+                  break;
+                }
+            }
           }
             break;
           default:
