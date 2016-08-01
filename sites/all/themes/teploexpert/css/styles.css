@@ -2237,6 +2237,15 @@ aside .block-menu > .menu li:hover > ul {
   position: relative;
 }
 
+.view-product-index .views-row .field {
+  display: inline-block;
+}
+
+.view-product-index .views-row .display-price {
+  float: none;
+  display: inline-block;
+}
+
 .view-product-index .views-row .views-field-title {
   height: 90px;
 }
@@ -2249,7 +2258,8 @@ aside .block-menu > .menu li:hover > ul {
   font-style: italic;
 }
 
-.view-product-index .views-row .views-field-nid {
+.view-product-index .views-row .views-field-nid,
+.view-product-index .views-row .add-to-cart {
   width: 125px;
   height: 33px;
   background: url("../images/btn-buy.png") no-repeat;
@@ -2259,12 +2269,17 @@ aside .block-menu > .menu li:hover > ul {
   position: absolute;
   bottom: -17px;
   left: 35px;
+  border: 0;
 }
 
-.view-product-index .views-row .views-field-nid a {
+.view-product-index .views-row .views-field-nid a,
+.view-product-index .views-row .views-field-nid input,
+.view-product-index .views-row .add-to-cart a,
+.view-product-index .views-row .add-to-cart input {
   display: block;
   width: 100%;
   height: 100%;
+  opacity: 0;
 }
 
 .view-product-index .views-row .views-field-uc-product-image {
