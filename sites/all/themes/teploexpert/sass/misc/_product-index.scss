@@ -1,5 +1,6 @@
 // Catalog Views
-.view-product-index {
+.view-product-index,
+.view-recommended {
   clear: both;
   margin-top: 20px;
   overflow: hidden;
@@ -207,4 +208,36 @@
       font-size: 1.1em;
     }
   }
+}
+
+.view-recommended {
+  position: relative;
+  height: 440px;
+  padding: 0 30px;
+
+  .views-row {
+    width: 193px;
+  }
+}
+
+.tz_prev {
+  width: 9px;
+  height: 33px;
+  background: url('../images/prev.png') no-repeat;
+  cursor: pointer;
+  position: absolute;
+  top: 45%;
+  margin-top: -4.5px;
+  left: 0;
+}
+
+.tz_next {
+  width: 9px;
+  height: 33px;
+  background: url('../images/next.png') no-repeat;
+  cursor: pointer;
+  position: absolute;
+  top: 45%;
+  margin-top: -4.5px;
+  right: 0;
 }

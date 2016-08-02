@@ -71,6 +71,13 @@
       $(document).bind('cbox_complete', function () {
         $('#cboxContent, #cboxLoadedContent').removeAttr('style');
       });
+      // slider controls
+      $('.tz_next').click(function () {
+        $('.view-recommended .view-content .views-row:first').appendTo('.view-recommended .view-content');
+       })
+    $('.tz_prev').click(function () {
+        $('.view-recommended .view-content .views-row:last').prependTo('.view-recommended .view-content');
+       })
     }
   };
 
