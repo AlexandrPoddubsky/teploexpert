@@ -21,6 +21,18 @@
   margin-bottom: 30px;
   overflow: hidden;
 
+  .em {
+    font-style: italic;
+
+    h1 {
+      font-size: 12px;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
   &.full {
     width: 100%;
     float: none;

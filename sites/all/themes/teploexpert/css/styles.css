@@ -2899,6 +2899,18 @@ aside .block-menu > .menu li:hover > ul {
   overflow: hidden;
 }
 
+.box1 .em {
+  font-style: italic;
+}
+
+.box1 .em h1 {
+  font-size: 12px;
+}
+
+.box1 p {
+  margin: 0;
+}
+
 .box1.full {
   width: 100%;
   float: none;
