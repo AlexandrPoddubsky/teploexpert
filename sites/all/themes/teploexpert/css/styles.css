@@ -2901,10 +2901,8 @@ aside .block-menu > .menu li:hover > ul {
 .col2 h1 {
   font-size: 12px;
   margin: 0;
-}
-
-.col2 h1 em {
   font-weight: normal;
+  line-height: 1em;
 }
 
 .box1 {
