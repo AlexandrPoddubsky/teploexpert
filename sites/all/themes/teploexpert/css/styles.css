@@ -2894,12 +2894,17 @@ aside .block-menu > .menu li:hover > ul {
   float: right;
 }
 
-.col2 em {
+.col2 .em {
   font-style: italic;
 }
 
 .col2 h1 {
   font-size: 12px;
+  margin: 0;
+}
+
+.col2 h1 em {
+  font-weight: normal;
 }
 
 .box1 {

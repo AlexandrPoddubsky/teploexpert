@@ -16,12 +16,17 @@
   width: 450px;
   float: right;
 
-  em {
+  .em {
     font-style: italic;
   }
 
   h1 {
       font-size: 12px;
+      margin: 0;
+
+      .em {
+        font-weight: normal;
+      }
     }
 }
 
