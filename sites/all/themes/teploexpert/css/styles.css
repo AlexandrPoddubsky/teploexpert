@@ -2455,6 +2455,7 @@ aside .block-menu > .menu li:hover > ul {
 
 .view-recommended .views-row {
   width: 193px;
+  margin: 0 17px 30px;
 }
 
 .tz_prev {
@@ -2693,6 +2694,17 @@ aside .block-menu > .menu li:hover > ul {
 .region-bottom .block {
   width: 1020px;
   margin: 0 auto;
+}
+
+.region-bottom .block-block:first-child {
+  text-align: left;
+}
+
+.region-bottom .block-block:first-child a {
+  line-height: 1.2em;
+  font-weight: bold;
+  display: inline-block;
+  width: 24%;
 }
 
 .view-install .views-row {

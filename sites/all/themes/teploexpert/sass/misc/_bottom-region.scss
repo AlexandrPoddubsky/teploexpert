@@ -21,4 +21,15 @@
     width: $zen-grid-width;
     margin: 0 auto;
   }
+
+  .block-block:first-child {
+    text-align: left;
+
+    a {
+      line-height: 1.2em;
+      font-weight: bold;
+      display: inline-block;
+      width: 24%;
+    }
+  }
 }
