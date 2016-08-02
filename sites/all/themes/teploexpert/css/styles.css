@@ -2876,4 +2876,83 @@ aside .block-menu > .menu li:hover > ul {
   display: none;
 }
 
+/**
+ *  styles for contacts page
+ */
+.include {
+  background: url("../images/bg-border-vertical.png") repeat-y 50% 0;
+  overflow: hidden;
+}
+
+.col1 {
+  width: 420px;
+  float: left;
+}
+
+.col2 {
+  width: 450px;
+  float: right;
+}
+
+.box1 {
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.box1.full {
+  width: 100%;
+  float: none;
+}
+
+.box1.half {
+  width: 46%;
+  float: left;
+  margin-left: 5%;
+}
+
+.box1 .holder {
+  margin: 30px 0 0;
+}
+
+.box1 .holder:first-child {
+  margin: 0;
+}
+
+.grid .half:first-child {
+  margin-left: 0;
+}
+
+.route-box {
+  width: 100%;
+  overflow: hidden;
+}
+
+.route-box .block {
+  width: 100%;
+  overflow: hidden;
+  margin: 40px 0 0;
+}
+
+.route-box .block:first-child {
+  margin: 0;
+}
+
+.route-box .block h3 {
+  width: 264px;
+  margin: 0 10px 0 0;
+  float: left;
+  text-transform: uppercase;
+  font: 18px/26px Tahoma, Arial, Helvetica, sans-serif;
+}
+
+.route-box .block .holder {
+  overflow: hidden;
+  height: 1%;
+  color: #888;
+}
+
+.route-box .block span {
+  color: #000;
+}
+
 /*# sourceMappingURL=styles.css.map */

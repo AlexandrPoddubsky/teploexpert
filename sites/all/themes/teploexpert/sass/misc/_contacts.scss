@@ -1,0 +1,79 @@
+/**
+ *  styles for contacts page
+ */
+
+.include {
+  background: url('../images/bg-border-vertical.png') repeat-y 50% 0;
+  overflow: hidden;
+}
+
+.col1 {
+  width: 420px;
+  float: left;
+}
+
+.col2 {
+  width: 450px;
+  float: right;
+}
+
+.box1 {
+  margin-bottom: 30px;
+  overflow: hidden;
+
+  &.full {
+    width: 100%;
+    float: none;
+  }
+
+  &.half {
+    width: 46%;
+    float: left;
+    margin-left: 5%;
+  }
+
+  .holder {
+    margin: 30px 0 0;
+
+    &:first-child {
+      margin: 0;
+    }
+  }
+}
+
+.grid .half:first-child {
+  margin-left: 0;
+}
+
+.route-box {
+  width: 100%;
+  overflow: hidden;
+
+  .block {
+    width: 100%;
+    overflow: hidden;
+    margin: 40px 0 0;
+
+    &:first-child {
+      margin: 0;
+    }
+
+    h3 {
+      width: 264px;
+      margin: 0 10px 0 0;
+      float: left;
+      text-transform: uppercase;
+      font: 18px/26px Tahoma, Arial, Helvetica, sans-serif;
+    }
+
+    .holder {
+      overflow: hidden;
+      height: 1%;
+      color: #888;
+    }
+
+    span {
+      color: #000;
+    }
+  }
+}
