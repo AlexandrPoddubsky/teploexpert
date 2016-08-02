@@ -2908,6 +2908,10 @@ aside .block-menu > .menu li:hover > ul {
   margin-left: 0;
 }
 
+#block-block-6 {
+  overflow: hidden;
+}
+
 .address-pane-table:not(.yur) .field-billing_company,
 .address-pane-table:not(.yur) .field-billing_ucxf_inn,
 .address-pane-table:not(.yur) .field-billing_ucxf_kpp,
