@@ -8,7 +8,7 @@
 <div id="cart-block-contents-ajax">
         <?php print $items_text; ?><br>
 
-        <label><?php print t('На сумму'); ?>: </label><?php print $total ;?>
+        <label><?php print t('На сумму'); ?>: </label><?php print round($total) ;?>&nbsp;р.
 
 <div id="cart-items">
   <table class="cart-block-items">
@@ -29,7 +29,7 @@
           <?php print $item['title']; print $item['descr']; ?>
         </td>
         <td>
-          <?php print $item['total'] ?>
+          <?php print round($item['total']) ?>&nbsp;р.
         </td>
       </tr>
       <tr>
@@ -47,7 +47,7 @@
         <?php print $items_text; ?>
       </td>
       <td class="cart-block-summary-total">
-        <label><?php print t('Total'); ?>: </label><?php print $total ;?>
+        <label><?php print t('Total'); ?>: </label><?php print round($total) ;?>&nbsp;р.
       </td>
     </tr>
     <tr class="cart-block-summary-links">
