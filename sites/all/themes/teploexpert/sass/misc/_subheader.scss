@@ -219,7 +219,8 @@
 }
 
 .mini-cart,
-.block-uc-cart {
+.block-uc-cart,
+.block-uc-ajax-cart {
   position: absolute;
   right: 0;
   color: #a7a7a7;
@@ -284,7 +285,8 @@
 // Colorbox cart
 #colorbox {
 
-  #cart-items {
+  #cart-items,
+  #cart-block-contents-ajax {
     margin: 20px;
 
     table {

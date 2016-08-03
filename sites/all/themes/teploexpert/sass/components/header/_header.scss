@@ -83,13 +83,14 @@
 
       input[type='text'] {
         float: left;
-        background: url('../images/bg-search.png') no-repeat;
+        // background: url('../images/bg-search.png') no-repeat;
         width: 287px;
         margin: 0;
         border: 0;
         font-size: 12px;
-        line-height: 15px;
+        line-height: 14px;
         padding: 6px 8px;
+        border-radius: 3px 0 0 3px;
       }
 
       input[type='submit'] {

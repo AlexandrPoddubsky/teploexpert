@@ -776,13 +776,13 @@ th {
 
 .header__region #search-block-form input[type='text'] {
   float: left;
-  background: url("../images/bg-search.png") no-repeat;
   width: 287px;
   margin: 0;
   border: 0;
   font-size: 12px;
-  line-height: 15px;
+  line-height: 14px;
   padding: 6px 8px;
+  border-radius: 3px 0 0 3px;
 }
 
 .header__region #search-block-form input[type='submit'] {
@@ -1947,7 +1947,8 @@ tr.drag-previous {
 }
 
 .mini-cart,
-.block-uc-cart {
+.block-uc-cart,
+.block-uc-ajax-cart {
   position: absolute;
   right: 0;
   color: #a7a7a7;
@@ -1961,19 +1962,24 @@ tr.drag-previous {
 .mini-cart p,
 .mini-cart ul,
 .block-uc-cart p,
-.block-uc-cart ul {
+.block-uc-cart ul,
+.block-uc-ajax-cart p,
+.block-uc-ajax-cart ul {
   margin: 0;
 }
 
 .mini-cart label,
-.block-uc-cart label {
+.block-uc-cart label,
+.block-uc-ajax-cart label {
   display: inline-block;
 }
 
 .mini-cart .cart-link,
 .mini-cart h2,
 .block-uc-cart .cart-link,
-.block-uc-cart h2 {
+.block-uc-cart h2,
+.block-uc-ajax-cart .cart-link,
+.block-uc-ajax-cart h2 {
   text-transform: uppercase;
   font: 18px/22px 'archiveregular', Arial, Helvetica, sans-serif;
   color: #2a8caf;
@@ -1985,83 +1991,100 @@ tr.drag-previous {
 .mini-cart .cart-link:hover,
 .mini-cart h2:hover,
 .block-uc-cart .cart-link:hover,
-.block-uc-cart h2:hover {
+.block-uc-cart h2:hover,
+.block-uc-ajax-cart .cart-link:hover,
+.block-uc-ajax-cart h2:hover {
   text-decoration: none;
 }
 
 .mini-cart .cart-link a,
 .mini-cart h2 a,
 .block-uc-cart .cart-link a,
-.block-uc-cart h2 a {
+.block-uc-cart h2 a,
+.block-uc-ajax-cart .cart-link a,
+.block-uc-ajax-cart h2 a {
   text-decoration: none;
   border-bottom: 1px dashed #22c1f0;
 }
 
 .mini-cart p a,
-.block-uc-cart p a {
+.block-uc-cart p a,
+.block-uc-ajax-cart p a {
   color: #2a8caf;
   font-weight: bold;
   text-decoration: none;
 }
 
 .mini-cart p a:hover,
-.block-uc-cart p a:hover {
+.block-uc-cart p a:hover,
+.block-uc-ajax-cart p a:hover {
   text-decoration: underline;
 }
 
 .mini-cart .cart-block-arrow,
-.block-uc-cart .cart-block-arrow {
+.block-uc-cart .cart-block-arrow,
+.block-uc-ajax-cart .cart-block-arrow {
   display: none;
 }
 
 .mini-cart .cart-block-title-bar,
-.block-uc-cart .cart-block-title-bar {
+.block-uc-cart .cart-block-title-bar,
+.block-uc-ajax-cart .cart-block-title-bar {
   padding: 0;
 }
 
 .mini-cart #cart-items,
-.block-uc-cart #cart-items {
+.block-uc-cart #cart-items,
+.block-uc-ajax-cart #cart-items {
   display: none;
 }
 
-#colorbox #cart-items {
+#colorbox #cart-items,
+#colorbox #cart-block-contents-ajax {
   margin: 20px;
 }
 
-#colorbox #cart-items table {
+#colorbox #cart-items table,
+#colorbox #cart-block-contents-ajax table {
   font-weight: bold;
 }
 
-#colorbox #cart-items .links {
+#colorbox #cart-items .links,
+#colorbox #cart-block-contents-ajax .links {
   padding: 0;
 }
 
-#colorbox #cart-items .links li {
+#colorbox #cart-items .links li,
+#colorbox #cart-block-contents-ajax .links li {
   display: inline-block;
   list-style: none;
   border-radius: 5px;
   padding: 10px;
 }
 
-#colorbox #cart-items .links li a {
+#colorbox #cart-items .links li a,
+#colorbox #cart-block-contents-ajax .links li a {
   color: #fff;
   text-transform: uppercase;
   text-decoration: none;
   font-weight: bold;
 }
 
-#colorbox #cart-items .links li a:hover {
+#colorbox #cart-items .links li a:hover,
+#colorbox #cart-block-contents-ajax .links li a:hover {
   text-decoration: underline;
 }
 
-#colorbox #cart-items .links li.cart-block-view-cart {
+#colorbox #cart-items .links li.cart-block-view-cart,
+#colorbox #cart-block-contents-ajax .links li.cart-block-view-cart {
   background: -webkit-linear-gradient(#ffad11, #ee8b00);
   background: linear-gradient(#ffad11, #ee8b00);
   border-bottom: 3px solid #cc6900;
   margin-right: 50px;
 }
 
-#colorbox #cart-items .links li.cart-block-checkout {
+#colorbox #cart-items .links li.cart-block-checkout,
+#colorbox #cart-block-contents-ajax .links li.cart-block-checkout {
   background: -webkit-linear-gradient(#33d2ff, #11b0df);
   background: linear-gradient(#33d2ff, #11b0df);
   border-bottom: 3px solid #008ebd;

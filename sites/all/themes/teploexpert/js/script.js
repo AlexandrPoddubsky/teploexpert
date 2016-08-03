@@ -44,7 +44,7 @@
       });
       // End of show more
       $('.cart-link').colorbox(
-        {inline: true, width: 500, height: 300, href: '#cart-items'}
+        {inline: true, width: 600, height: 500, href: '#cart-items'}
       );
 
       // Checking ownership
