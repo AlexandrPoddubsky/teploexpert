@@ -27,11 +27,11 @@
         }
       });
 
-      $(cutter).parent().parent().append('<div class="readmore show-more">Показать все</div>');
+        $(cutter).once('my_custom_behavior').parent().parent().append('<div class="readmore show-more">Показать все</div>');
 
       $(cutter).nextAll().hide();
 
-      $('.readmore').click(function () {
+      $('.readmore').once('my_custom_behavior').click(function () {
         if ($(this).hasClass('show-more')) {
           $(this).text('Скрыть');
           $(this).parent().children().find(cutter).nextAll().show(200);
@@ -43,9 +43,16 @@
         $(this).toggleClass('show-less show-more');
       });
       // End of show more
-      $('.cart-link').colorbox(
-        {inline: true, width: 600, height: 500, href: '#cart-items'}
-      );
+
+      $('.cart-link').click(function (e) {
+        e.preventDefault();
+        $('#cart-overlay').fadeIn(500);
+      });
+      $('#closinger, #cart-overlay').click(function (e) {
+        if ($(e.target).closest('#cart-items').length == 0) {
+          $('#cart-overlay').fadeOut(500);
+        }
+      });
 
       // Checking ownership
       $('.ownership').change(function () {

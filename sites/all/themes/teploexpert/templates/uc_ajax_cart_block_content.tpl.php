@@ -9,24 +9,26 @@
         <?php print $items_text; ?><br>
 
         <label><?php print t('На сумму'); ?>: </label><?php print round($total) ;?>&nbsp;р.
-
+<div id="cart-overlay">
 <div id="cart-items">
+<div id="closinger"></div>
+<div class="cart-title">
+  <div>
+    Корзина
+  </div>
+</div>
   <table class="cart-block-items">
-    <thead>
-      <tr>
-        <th colspan="4">
-          <?php print t('Products')?>
-        </th>
-      </tr>
-    </thead>
     <tbody>
-      <?php foreach ( $items as $item ):?>
+      <?php foreach ( $items as $item ): ?>
       <tr class="odd">
-        <td class="cart-block-item-qty">
-          <?php print $item['qty'] ?>
+        <td class="cart-image">
+          <?php print render($item['image']); ?>
         </td>
         <td class="cart-block-item-title">
           <?php print $item['title']; print $item['descr']; ?>
+        </td>
+        <td class="cart-block-item-qty">
+          <?php print $item['qty']; ?>
         </td>
         <td>
           <?php print round($item['total']) ?>&nbsp;р.
@@ -41,7 +43,7 @@
     </tbody>
   </table>
 <table>
-  <tbody>
+  <tbody class="cart-summ">
     <tr>
       <td class="cart-block-summary-items">
         <?php print $items_text; ?>
@@ -57,5 +59,6 @@
     </tr>
   </tbody>
 </table>
+</div>
 </div>
 </div>
