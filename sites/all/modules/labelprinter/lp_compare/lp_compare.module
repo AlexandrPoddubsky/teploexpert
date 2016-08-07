@@ -107,7 +107,7 @@ function lp_compare_list($tid) {
     $title = $node->title;
     $nodes[$key] = node_view($node);
     $nodes[$key]['title'] = $title;
-    $nodes[$key]['uc_product_image'][0]['#image_style'] = 'product_grid';
+    $nodes[$key]['uc_product_image'][0]['#image_style'] = 'product-grid';
   }
 
   $table[0] = array('');
