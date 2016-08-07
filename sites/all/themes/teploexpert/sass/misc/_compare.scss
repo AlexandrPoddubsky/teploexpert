@@ -1,0 +1,37 @@
+/**
+ *  Styles for comparison list
+ */
+ .product-compare-table {
+
+  a {
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  tr:nth-child(2n) {
+    background-color: color('grey-extra-light');
+  }
+
+  td:not(:first-child) {
+    font-weight: bold;
+  }
+
+  .uc-price {
+    font-size: 1.5em;
+  }
+
+  .node-add-to-cart {
+    width: 125px;
+    height: 33px;
+    background: url('../images/btn-buy.png') no-repeat;
+    text-indent: -9999px;
+    overflow: hidden;
+    display: block;
+    border: 0;
+  }
+
+  .remove-compare {
+    border: 0;
+    background: transparent;
+  }
+ }

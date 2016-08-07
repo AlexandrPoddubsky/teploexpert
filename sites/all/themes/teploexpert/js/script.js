@@ -48,10 +48,13 @@
         e.preventDefault();
         $('#cart-overlay').fadeIn(500);
       });
-      $('#closinger, #cart-overlay').click(function (e) {
+      $(document).delegate('#cart-overlay', 'click', function (e) {
         if ($(e.target).closest('#cart-items').length == 0) {
           $('#cart-overlay').fadeOut(500);
         }
+      });
+      $(document).delegate('#closinger', 'click', function (e) {
+        $('#cart-overlay').fadeOut(500);
       });
 
       // Checking ownership
@@ -77,6 +80,7 @@
       });
       $(document).bind('cbox_complete', function () {
         $('#cboxContent, #cboxLoadedContent').removeAttr('style');
+        $('#colorbox').append('<div>trololo</div>');
       });
       // slider controls
       $('.tz_next').click(function () {

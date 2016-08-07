@@ -11,6 +11,12 @@
     <?php print drupal_render($form['range-to']); ?>
   </div>
   <div class="yui3-u range-slider-box">
+  <div class="range-min">
+  <?php print $form['range-min']['#value'];?>
+  </div>
+  <div class="range-max">
+  <?php print $form['range-max']['#value'];?>
+  </div>
     <?php print drupal_render($form['range-slider']); ?>
   </div>
 </div>

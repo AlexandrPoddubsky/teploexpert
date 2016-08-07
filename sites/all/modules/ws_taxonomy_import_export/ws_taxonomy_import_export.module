@@ -115,7 +115,10 @@ function ws_taxonomy_export_form_submit ($form, &$form_state) {
             }
             $value = implode(';', $val_array);
             break;
-
+        case 'h1' :
+        $h1 = _taxonomy_title_get_title($term->tid)  ;
+        $value = !empty($h1) ? $h1: null;
+        break;
         default:
           $value = null;
           break;
@@ -250,6 +253,9 @@ function ws_taxonomy_import_export_process_import($row, &$context) {
         $term->description = $row['description'];
       }
     }
+   if (!empty($row['h1'])) {
+    $term->taxonomy_title = $row['h1'];
+   }
    taxonomy_term_save($term);
      if (!isset($context['results']['updated'])) {$context['results']['updated'] = 1;} else {$context['results']['updated']++;}
   }
@@ -298,6 +304,10 @@ function ws_taxonomy_get_fields ($type) {
     'meta_description' => array(
       'label' => t('meta_description'),
       'type' => 'meta',
+      ),
+    'h1' => array(
+      'label' => t('H1'),
+      'type' => 'h1',
       ),
     );
   foreach ($common_fields as $field => $value) {

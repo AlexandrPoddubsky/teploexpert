@@ -20,8 +20,8 @@ msgstr "Добавить в корзину"
 
 #: templates/lp_compare.tpl.php:7
 msgid "compare"
-msgstr "к сравнению"
+msgstr "К сравнению"
 
 #: templates/lp_compare.tpl.php:9
 msgid "add to comparison"
-msgstr "сравнить"
+msgstr "Сравнить"

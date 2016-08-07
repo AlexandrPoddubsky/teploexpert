@@ -23,6 +23,7 @@
         <?php
         print render($content['field_weight']);
         ?></div>
+        <?php print render($content['compare']); ?>
         <div class="views-field views-field-price"><span class="views-label views-label-price">Цена: </span>
         <?php
         print render($content['display_price']);

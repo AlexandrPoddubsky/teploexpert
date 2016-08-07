@@ -9,7 +9,7 @@ function lp_compare_menu() {
     'page arguments' => array(1),
     'access callback' => true,
     'type' => MENU_CALLBACK,
-  );  
+  );
   $items['compare/manage/%/%'] = array(
     'page callback' => 'lp_compare_manage',
     'page arguments' => array(2, 3),
@@ -36,7 +36,7 @@ function lp_compare_manage($tid, $nid) {
       $result['error'] = t('You can compare @n products or less.', array('@n' => LP_COMPARISON_LIMIT));
     } else {
       $nids[] = $nid;
-    }   
+    }
   } else {
     unset($nids[$key]);
   }
@@ -50,7 +50,7 @@ function lp_compare_node_view($node, $view_mode, $langcode) {
   if ($view_mode == 'search_result' || !in_array($node->type, uc_product_types())) {
     return;
   }
-  if (!isset($node->taxonomy_catalog[LANGUAGE_NONE][0]['tid'])) {
+  if (!isset($node->field_category[LANGUAGE_NONE][0]['tid'])) {
     return;
   }
   $path = current_path();
@@ -59,7 +59,7 @@ function lp_compare_node_view($node, $view_mode, $langcode) {
   }
 
   drupal_add_js(drupal_get_path('module', 'lp_compare') . '/js/lp_compare.js');
-  $tid = $node->taxonomy_catalog[LANGUAGE_NONE][0]['tid'];
+  $tid = $node->field_category[LANGUAGE_NONE][0]['tid'];
 
   $parents = taxonomy_get_parents($tid);
   $parent = array_shift($parents);
@@ -88,9 +88,6 @@ function lp_set_comparison_list($tid, $nids) {
 }
 
 function lp_compare_list($tid) {
-  if (($type = lp_get_type_by_tid($tid)) == false) {
-    drupal_not_found();
-  }
 
   $nids = lp_get_comparison_list($tid);
   if (empty($nids)) {
@@ -98,13 +95,24 @@ function lp_compare_list($tid) {
   }
 
   $nodes = node_load_multiple($nids);
+  $types = array();
+  foreach ($nodes as $node) {
+    $types[$node->nid] = $node->type;
+  }
+  $type = array_shift($types);
+  foreach ($types as $nid => $ntype) {
+    if ($ntype != $type) unset($nodes[$nid]);
+  }
   foreach ($nodes as $key => $node) {
+    $title = $node->title;
     $nodes[$key] = node_view($node);
+    $nodes[$key]['title'] = $title;
+    $nodes[$key]['uc_product_image'][0]['#image_style'] = 'product_grid';
   }
 
   $table[0] = array('');
-  foreach ($nodes as $node) {
-    $table[0][] = mtech_product_image($node['#node'], 'thumbnail_170');
+  foreach ($nodes as $nid => $node) {
+    $table[0][] = l($node['title'], drupal_get_path_alias('node/' . $nid));
   }
 
   $table[1] = array(t('Price'));
@@ -112,13 +120,20 @@ function lp_compare_list($tid) {
     $table[1][] = theme('uc_price', array('price' => $node['#node']->price)) . '</div>';
   }
 
-  $i = 2;
+  $table[2] = array('');
+  foreach ($nodes as $nid => $node) {
+    $form = drupal_get_form('lp_compare_remove_form', $nid);
+    $table[2][] = render($form);
+  }
+
+  $i = 3;
 
   $fields = field_info_instances('node', $type);
-  $group = field_group_load_field_group('group_specification', 'node', $type, 'form');
-  if (!empty($group)) {
-    foreach ($group->children as $field_name) {
-      $field = $fields[$field_name];
+  foreach ($fields as $field_name => $field) {
+    if ($field['widget']['type'] != 'term_reference_tree' &&
+      $field['widget']['type'] != 'text_textarea_with_summary' &&
+      $field['widget']['type'] != 'taxonomy_autocomplete' &&
+      $field_name != 'field_sku') {
       $values = array();
       foreach ($nodes as $node) {
         $node[$field_name]['#label_display'] = 'hidden';
@@ -167,4 +182,38 @@ function lp_compare_list($tid) {
   $output .= '</table>';
 
   return $output;
+}
+
+/**
+ * Remove product form
+ */
+function lp_compare_remove_form($form, &$form_state, $nid) {
+  $form = array();
+  $form['nid'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $nid,
+    );
+  $form['tid'] = array(
+    '#type' => 'hidden',
+    '#default_value' => arg(1),
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Удалить',
+    '#attributes' => array(
+      'class' => array('remove-compare'),
+      ),
+    );
+  return $form;
+}
+
+/**
+ * Submit callback for remove form
+ */
+function lp_compare_remove_form_submit ($form, &$form_state) {
+  $tid = $form_state['values']['tid'];
+  $nid = $form_state['values']['nid'];
+  foreach ($_SESSION['comparison_list'][$tid] as $key => $value) {
+    if ($value == $nid) unset($_SESSION['comparison_list'][$tid][$key]);
+  }
 }

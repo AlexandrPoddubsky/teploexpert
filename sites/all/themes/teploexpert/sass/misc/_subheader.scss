@@ -461,3 +461,13 @@ form {
 .webform-confirmation + .links {
   display: none;
 }
+
+// Some stupid cbox customizing
+#cboxClose {
+  background: url('../images/btn-close.png') no-repeat;
+  top: 0;
+  right: 0;
+  height: 30px;
+  width: 30px;
+  margin-top: 5px;
+}
