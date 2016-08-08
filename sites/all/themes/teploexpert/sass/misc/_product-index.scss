@@ -204,7 +204,8 @@
 }
 
 .block-facetapi.brand-filter,
-.block-ws-brand-block {
+.block-ws-brand-block,
+.block.series {
   clear: both;
   float: none;
   width: auto;
@@ -217,6 +218,10 @@
     font-weight: normal;
     font-style: italic;
     color: color('grey');
+    margin: 0;
+  }
+
+  p {
     margin: 0;
   }
 

@@ -2550,7 +2550,8 @@ aside .block-menu > .menu li:hover > ul {
 }
 
 .block-facetapi.brand-filter,
-.block-ws-brand-block {
+.block-ws-brand-block,
+.block.series {
   clear: both;
   float: none;
   width: auto;
@@ -2559,7 +2560,8 @@ aside .block-menu > .menu li:hover > ul {
 }
 
 .block-facetapi.brand-filter .block__title,
-.block-ws-brand-block .block__title {
+.block-ws-brand-block .block__title,
+.block.series .block__title {
   font-size: 1rem;
   font-family: Arial, Helvetica, "Nimbus Sans L", sans-serif;
   font-weight: normal;
@@ -2568,19 +2570,28 @@ aside .block-menu > .menu li:hover > ul {
   margin: 0;
 }
 
+.block-facetapi.brand-filter p,
+.block-ws-brand-block p,
+.block.series p {
+  margin: 0;
+}
+
 .block-facetapi.brand-filter li,
-.block-ws-brand-block li {
+.block-ws-brand-block li,
+.block.series li {
   display: inline-block;
   margin-right: 5px;
 }
 
 .block-facetapi.brand-filter li div,
-.block-ws-brand-block li div {
+.block-ws-brand-block li div,
+.block.series li div {
   display: inline;
 }
 
 .block-facetapi.brand-filter a,
-.block-ws-brand-block a {
+.block-ws-brand-block a,
+.block.series a {
   font-size: 16px;
   font-weight: bold;
   color: #000;
@@ -2588,7 +2599,8 @@ aside .block-menu > .menu li:hover > ul {
 }
 
 .block-facetapi.brand-filter a:hover,
-.block-ws-brand-block a:hover {
+.block-ws-brand-block a:hover,
+.block.series a:hover {
   color: #ff9c00;
   text-decoration: underline;
 }
