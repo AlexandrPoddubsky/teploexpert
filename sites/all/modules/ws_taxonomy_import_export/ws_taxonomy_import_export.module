@@ -64,7 +64,6 @@ function ws_taxonomy_export_form_submit ($form, &$form_state) {
   $objPHPExcel = new PHPExcel();
 
   $fields = ws_taxonomy_get_fields($type);
-  $node_types = node_type_get_types();
 
   $j = 0;
   foreach ($fields as $field) {
@@ -78,7 +77,7 @@ function ws_taxonomy_export_form_submit ($form, &$form_state) {
     foreach ($fields as $field => $field_info) {
       switch ($field_info['type']) {
         case 'meta':
-          if (empty($node->metatags)) {
+          if (empty($term->metatags)) {
             $value = null;
             break;
           }
