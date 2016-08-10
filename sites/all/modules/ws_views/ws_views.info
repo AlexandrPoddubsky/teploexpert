@@ -1,0 +1,4 @@
+name = WS Views
+description = Some views tweaks
+package = WellSolutions
+core = 7.x

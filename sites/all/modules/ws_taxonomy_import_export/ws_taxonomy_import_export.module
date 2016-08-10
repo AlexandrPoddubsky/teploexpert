@@ -255,6 +255,10 @@ function ws_taxonomy_import_export_process_import($row, &$context) {
    if (!empty($row['h1'])) {
     $term->taxonomy_title = $row['h1'];
    }
+   if (!empty($row['field_url'])) {
+    $term->field_url['und'][0]['value'] = $row['field_url'];
+  $term->path['pathauto'] = '1';
+   }
    taxonomy_term_save($term);
      if (!isset($context['results']['updated'])) {$context['results']['updated'] = 1;} else {$context['results']['updated']++;}
   }

@@ -1,0 +1,16 @@
+<?php
+/**
+ * Implements hook_views_pre_render()
+ * It's necessary to replace default taxonomy term names with titles, provided by texonomy_title module
+ */
+function ws_views_views_pre_render (&$view) {
+  if ($view->name == 'subcategories') {
+    foreach ($view->result as $key => $result) {
+      $tid = $result->tid;
+      $title = _taxonomy_title_get_title($tid);
+      if (!empty($title)) {
+        $result->taxonomy_term_data_name = _taxonomy_title_get_title($tid);
+      }
+    }
+  }
+}
