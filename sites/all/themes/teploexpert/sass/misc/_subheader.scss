@@ -336,8 +336,8 @@
       &.cart-block-items {
         border-bottom: 1px solid black;
 
-        tr:not(:last-child) {
-          border-bottom: 1px solid dotted;
+        tr.line-item {
+          border-bottom: 1px dotted black;
         }
 
         .cart-image a {
@@ -345,9 +345,34 @@
           width: 50px;
           margin: 0 10px;
         }
+
+        .item-price {
+          font-size: 1.2em;
+          color: #000;
+          white-space: nowrap;
+        }
+
+        .remove-cart-link {
+          color: color('grey');
+          font-size: 0.8em;
+          font-style: italic;
+        }
       }
 
       .cart-summ {
+
+        .cart-block-summary-total {
+          text-align: right;
+
+          label {
+            margin-right: 20px;
+          }
+
+          .total {
+            color: #000;
+            font-size: 2em;
+          }
+        }
 
         tr.cart-block-summary-links td {
           padding-bottom: 20px;
@@ -372,6 +397,8 @@
         list-style: none;
         border-radius: 5px;
         padding: 10px;
+        margin-top: 10px;
+        line-height: 1em;
 
         a {
           color: #fff;
@@ -384,7 +411,8 @@
           text-decoration: underline;
         }
 
-        &.cart-block-view-cart {
+        &.cart-block-view-cart,
+        &.closinger {
           background: linear-gradient(color('yellow') + #111, color('yellow') - #111);
           border-bottom: 3px solid color('yellow') - #333;
           margin-right: 50px;
@@ -393,7 +421,7 @@
         &.cart-block-checkout {
           background: linear-gradient(color('blue') + #111, color('blue') - #111);
           border-bottom: 3px solid color('blue') - #333;
-          margin-right: 50px;
+          margin-right: 20px;
         }
       }
     }

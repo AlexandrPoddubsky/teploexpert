@@ -53,7 +53,8 @@
           $('#cart-overlay').fadeOut(500);
         }
       });
-      $(document).delegate('#closinger', 'click', function (e) {
+      $(document).delegate('#closinger, .closinger', 'click', function (e) {
+        e.preventDefault();
         $('#cart-overlay').fadeOut(500);
       });
 
@@ -89,6 +90,12 @@
     $('.tz_prev').click(function () {
         $('.view-recommended .view-content .views-row:last').prependTo('.view-recommended .view-content');
        })
+    $('#ajaxCartUpdate').ajaxComplete(function (event, request, settings) {
+      if (request.responseURL.indexOf('uc_ajax_cart/show') >= 0) {
+        $('.cart-link').click();
+      }
+
+    });
     }
   };
 

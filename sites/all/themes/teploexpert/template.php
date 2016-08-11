@@ -270,3 +270,18 @@ function teploexpert_page_alter(&$page) {
 
   }
 }
+
+function teploexpert_uc_ajax_cart_cart_links() {
+  $items[] = array(
+    'data' => l(t('Продолжить покупки'), array('attributes' => array('rel' => 'nofollow'), 'fragment' => 'refresh', 'external' => TRUE)),
+    'class' => array('closinger'),
+  );
+  // Only add the checkout link if checkout is enabled.
+  if (variable_get('uc_checkout_enabled', TRUE)) {
+    $items[] = array(
+      'data' => l(t('Checkout'), 'cart/checkout', array('attributes' => array('rel' => 'nofollow'))),
+      'class' => array('cart-block-checkout'),
+    );
+  }
+  return theme('item_list', array('items' => $items, 'title' => NULL, 'type' => 'ul', 'attributes' => array('class' => array('links'))));
+}

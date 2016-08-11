@@ -8,7 +8,7 @@
 <div id="cart-block-contents-ajax">
         <?php print $items_text; ?><br>
 
-        <label><?php print t('На сумму'); ?>: </label><?php print round($total) ;?>&nbsp;р.
+        <label><?php print t('На сумму'); ?>: </label><?php print number_format($total, 0 , '.', ' ') ;?>&nbsp;р.
 <div id="cart-overlay">
 <div id="cart-items">
 <div id="closinger"></div>
@@ -20,7 +20,7 @@
   <table class="cart-block-items">
     <tbody>
       <?php foreach ( $items as $item ): ?>
-      <tr class="odd">
+      <tr class="line-item">
         <td class="cart-image">
           <?php print render($item['image']); ?>
         </td>
@@ -28,15 +28,11 @@
           <?php print $item['title']; print $item['descr']; ?>
         </td>
         <td class="cart-block-item-qty">
-          <?php print $item['qty']; ?>
-        </td>
-        <td>
-          <?php print round($item['total']) ?>&nbsp;р.
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4" class="cart-block-item-desc">
+          <?php print $item['qty']; ?>&nbsp;шт.
           <?php print $item['remove_link'] ?>
+        </td>
+        <td class="item-price">
+          <?php print number_format($item['total'], 0 , '.', ' ') ?>&nbsp;р.
         </td>
       </tr>
       <?php endforeach; ?>
@@ -46,10 +42,10 @@
   <tbody class="cart-summ">
     <tr>
       <td class="cart-block-summary-items">
-        <?php print $items_text; ?>
+        <?php //print $items_text; ?>
       </td>
       <td class="cart-block-summary-total">
-        <label><?php print t('Total'); ?>: </label><?php print round($total) ;?>&nbsp;р.
+        <label><?php print t('Total'); ?>: </label><span class="total"><?php print number_format($total, 0 , '.', ' ') ;?>&nbsp;р.</span>
       </td>
     </tr>
     <tr class="cart-block-summary-links">
