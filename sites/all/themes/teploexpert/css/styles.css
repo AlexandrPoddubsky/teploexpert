@@ -2400,9 +2400,16 @@ aside .block-menu > .menu li:hover > ul {
   text-decoration: none;
 }
 
+.view-product-index .views-row .views-field-dimensions,
+.view-recommended .views-row .views-field-dimensions {
+  white-space: nowrap;
+}
+
 .view-product-index .views-row .views-field-field-sku,
 .view-recommended .views-row .views-field-field-sku {
   font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .view-product-index .views-row .views-field-nid,

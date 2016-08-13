@@ -273,7 +273,7 @@ function teploexpert_page_alter(&$page) {
 
 function teploexpert_uc_ajax_cart_cart_links() {
   $items[] = array(
-    'data' => l(t('Продолжить покупки'), array('attributes' => array('rel' => 'nofollow'), 'fragment' => 'refresh', 'external' => TRUE)),
+    'data' => l(t('Продолжить покупки'), '#', array('attributes' => array('rel' => 'nofollow'), 'fragment' => 'refresh', 'external' => TRUE)),
     'class' => array('closinger'),
   );
   // Only add the checkout link if checkout is enabled.

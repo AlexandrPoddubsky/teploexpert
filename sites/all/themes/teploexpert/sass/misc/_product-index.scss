@@ -35,8 +35,14 @@
       }
     }
 
+    .views-field-dimensions {
+      white-space: nowrap;
+    }
+
     .views-field-field-sku {
       font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .views-field-nid,

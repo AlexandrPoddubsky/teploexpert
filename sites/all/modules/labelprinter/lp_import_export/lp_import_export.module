@@ -140,24 +140,16 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           break;
           case 'image_image':
             if (empty($node->uc_product_image)) {
-             /* $filepath = 'http://teploexpert.com' . $value;
-              $mime_raw = explode('.', $value);
-              $mime = array_pop($mime_raw);
-              $land = 'public://'. $node->model . '.' . $mime;
-              if (copy($filepath, $land)) {
-                $file = new stdClass;
-                $file->uid = $user->uid;
-                $file->uri = $land;
-                $file->filename = $node->model . '.' . $mime;
-                $file->filemime = $mime;
-                $file->status = 1;
-                file_save($file);
+              $oldfile = db_select('file_managed', 'f')
+                ->fields('f', array('fid'))
+                ->condition('f.filename', $value)
+                ->execute()
+                ->fetchField();
+                if (!empty($oldfile)) {
+                  $file = file_load($oldfile);
+                } else {
 
-                $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
-                break;
-              }*/
-              foreach ($ext as $val) {
-                $filepath = $folder . '/' . $node->model . '.' . $val;
+                $filepath = $folder . '/' . $value;
                 if (file_exists($filepath)) {
                   $file = new stdClass;
                   $file->uid = $user->uid;
@@ -167,11 +159,10 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
 
                   $file = file_copy($file, 'public://');
                   file_unmanaged_delete($filepath);
-
-                  $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
-                  break;
                 }
-            }
+              }
+              if (isset($file)) $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
+              break;
           }
             break;
           default:
