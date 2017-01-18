@@ -45,7 +45,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" ?>
 		}
 	}
 ?>
-	<offer id="<?php echo $node -> model ?>" available="<?php echo $avl;?>">
+	<offer id="<?php echo $node -> nid ?>" available="<?php echo $avl;?>">
 	<url><?php echo url('node/' . $node -> nid, array('absolute' => TRUE)); ?></url>
 	<?php /* <vendorCode> echo $node -> model </vendorCode> */?>
 	<price><?php echo $node -> sell_price ?></price>

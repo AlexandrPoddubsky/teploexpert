@@ -250,6 +250,7 @@ function ws_taxonomy_import_export_process_import($row, &$context) {
    if (isset($row['description'])) {
       if (!empty($row['description'])) {
         $term->description = $row['description'];
+        $term->format = 'full_html';
       }
     }
    if (!empty($row['h1'])) {

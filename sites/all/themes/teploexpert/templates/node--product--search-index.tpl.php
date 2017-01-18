@@ -23,6 +23,12 @@
         <?php
         print render($content['field_weight']);
         ?></div>
+		<?php if (isset($content['field_power'])): ?>
+		<div class="views-field views-field-power"><span class="views-label views-label-field-power">Мощность, Вт: </span>
+        <?php
+        print render($content['field_power']);
+        ?></div>
+		<?php endif; ?>
         <?php print render($content['compare']); ?>
         <div class="views-field views-field-price"><span class="views-label views-label-price">Цена: </span>
         <?php

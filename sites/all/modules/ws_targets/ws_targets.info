@@ -1,0 +1,4 @@
+name = WS Targets
+description = Provides 'onclick' attribute for some forms
+package = WellSolutions
+core = 7.x

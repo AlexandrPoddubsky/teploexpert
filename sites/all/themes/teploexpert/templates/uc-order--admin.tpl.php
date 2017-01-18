@@ -9,7 +9,7 @@
 <p>
 <?php print t('Order number:'); ?> <?php print $order_admin_link; ?><br />
 <?php print t('Customer:'); ?> <?php print $uc_addresses_shipping_first_name; ?> <?php print $uc_addresses_shipping_last_name; ?> - <?php print $order_email; ?><br />
-<?php print t('Phone:'); ?> <?php print $uc_addresses_shipping_phone; ?><br />
+<?php print t('Phone:'); ?> <?php print $uc_addresses_billing_phone; ?><br />
 <?php print t('Order total:'); ?> <?php print $order_total; ?><br />
 <?php print t('Shipping method:'); ?> <?php print $order_shipping_method; ?>
 </p>

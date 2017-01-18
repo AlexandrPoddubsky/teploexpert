@@ -169,6 +169,10 @@ function lp_export_form_submit($form_id, &$form_state) {
   foreach (lp_misc_get_terms_by_vocabulary_name('tags') as $term) {
     $tags[$term->tid] = $term->name;
   }
+  $series = array();
+  foreach (lp_misc_get_terms_by_vocabulary_name('series') as $term) {
+    $series[$term->tid] = $term->name;
+  }
 
   $j = 0;
   foreach ($fields as $field) {
@@ -266,6 +270,13 @@ function lp_export_form_submit($form_id, &$form_state) {
               }
               $value = implode(', ', $array_tags);
               break;
+			case 'field_series':
+              $array_series = array();
+              foreach ($node->{$field}[LANGUAGE_NONE] as $val) {
+                $array_series[] = $series[$val['tid']];
+              }
+              $value = implode(', ', $array_series);
+              break;  
             default:
               # code...
               break;

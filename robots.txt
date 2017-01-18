@@ -14,41 +14,8 @@
 # http://www.robotstxt.org/robotstxt.html
 
 User-agent: *
-Crawl-delay: 10
-# CSS, JS, Images
-Allow: /misc/*.css$
-Allow: /misc/*.css?
-Allow: /misc/*.js$
-Allow: /misc/*.js?
-Allow: /misc/*.gif
-Allow: /misc/*.jpg
-Allow: /misc/*.jpeg
-Allow: /misc/*.png
-Allow: /modules/*.css$
-Allow: /modules/*.css?
-Allow: /modules/*.js$
-Allow: /modules/*.js?
-Allow: /modules/*.gif
-Allow: /modules/*.jpg
-Allow: /modules/*.jpeg
-Allow: /modules/*.png
-Allow: /profiles/*.css$
-Allow: /profiles/*.css?
-Allow: /profiles/*.js$
-Allow: /profiles/*.js?
-Allow: /profiles/*.gif
-Allow: /profiles/*.jpg
-Allow: /profiles/*.jpeg
-Allow: /profiles/*.png
-Allow: /themes/*.css$
-Allow: /themes/*.css?
-Allow: /themes/*.js$
-Allow: /themes/*.js?
-Allow: /themes/*.gif
-Allow: /themes/*.jpg
-Allow: /themes/*.jpeg
-Allow: /themes/*.png
 # Directories
+
 Disallow: /includes/
 Disallow: /misc/
 Disallow: /modules/
@@ -74,10 +41,12 @@ Disallow: /comment/reply/
 Disallow: /filter/tips/
 Disallow: /node/add/
 Disallow: /search/
-Disallow: /user/register/
-Disallow: /user/password/
-Disallow: /user/login/
-Disallow: /user/logout/
+Disallow: /user
+Disallow: /cart
+Disallow: /compare
+Disallow: /taxonomy
+Disallow: /term
+Disallow: /node
 # Paths (no clean URLs)
 Disallow: /?q=admin/
 Disallow: /?q=comment/reply/
@@ -88,3 +57,66 @@ Disallow: /?q=user/password/
 Disallow: /?q=user/register/
 Disallow: /?q=user/login/
 Disallow: /?q=user/logout/
+
+
+#Убираем параметры фильтра
+Disallow: /vodonagrevateli*f[0]*
+Disallow: /vodopodgotovka*f[0]*
+Disallow: /vstroennye_pylesosy*f[0]*
+Disallow: /gorelki*f[0]*
+Disallow: /armatura*f[0]*
+Disallow: /dymokhody*f[0]*
+Disallow: /instrument*f[0]*
+Disallow: /climatic*f[0]*
+Disallow: /kollektory_grebenki_komplektuyushchie*f[0]*
+Disallow: /konvektory*f[0]*
+Disallow: /nakopitelnye_emkosti_dlya_vody_i_dizelnogo_topliva*f[0]*
+Disallow: /truby_i_fitingi*f[0]*
+Disallow: /teplotrassy*f[0]*
+Disallow: /teplonositel*f[0]*
+Disallow: /sushilki_dlya_ruk*f[0]*
+Disallow: /stabilizatory*f[0]*
+Disallow: /sistema_zashchity_ot_protechki_vody*f[0]*
+Disallow: /otopitelnyye_kotly*f[0]*
+Disallow: /obogrevateli*f[0]*
+Disallow: /teploventilyatory*f[0]*
+Disallow: /nasosy*f[0]*
+Disallow: /radiatory*f[0]*
+Disallow: /rasshiritelnye_baki_i_gidroakkumulyatory*f[0]*
+Disallow: /septiki_ochistnye_sooruzheniya*f[0]*
+Disallow: /polotentsesushiteli*f[0]*
+Disallow: /elektricheskiy_teplyy_pol*f[0]*
+Disallow: /elektrogeneratory*f[0]*
+
+#Удаляем из индекса старые URL с параметрами
+Disallow: *count
+Disallow: *nmaker
+Disallow: *count
+Disallow: *f101
+Disallow: *from
+Disallow: *id_product
+Disallow: *id
+Disallow: *name
+Disallow: *nmaker
+Disallow: *ord
+Disallow: *order
+Disallow: *PAGEN_11
+Disallow: *PAGEN_14
+Disallow: *PAGEN_17
+Disallow: *PAGEN_5
+Disallow: *PAGEN_6
+Disallow: *PAGEN_8
+Disallow: *print
+Disallow: *set_filter
+Disallow: *sort
+
+
+Clean-param: page *
+Clean-param: utm_source&utm_medium&utm_term&utm_campaign&utm_content *
+Clean-param: f102&t102 *
+Clean-param: ymclid *
+
+
+
+Sitemap: http://www.teploexpert.com/sitemap.xml
+Host: www.teploexpert.com

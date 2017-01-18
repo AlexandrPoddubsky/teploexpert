@@ -1,0 +1,14 @@
+<?php
+/**
+ * Add 'onclick' to forms
+ */
+function ws_targets_form_alter (&$form, &$form_state, $form_id) {
+
+// Цель для нажатия на кнопку добавления товара в корзину
+// Например "yaCounter012345.reachGoal('zayavka'); yaglaaction('zayavka'); return true;"
+$cart_target = "yaCounter20004142.reachGoal('kupit'); return true;";
+
+  if (strpos($form_id, 'uc_product_add_to_cart_form_') !== FALSE ) {
+    $form['actions']['submit']['#attributes']['onclick'] = $cart_target;
+  }
+}

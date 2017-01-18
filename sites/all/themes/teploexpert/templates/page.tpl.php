@@ -7,6 +7,9 @@
  * @see https://drupal.org/node/1728148
  */
 ?>
+<!-- CallBaska -->
+<script src="https://my.callbaska.ru/callback.js" async type="text/javascript" charset="utf-8"></script>
+<!-- CallBaska -->
 <div id="header-wrapper">
 <div class="layout-center">
 
@@ -144,3 +147,4 @@
 </div>
 
 <?php print render($page['bottom']); ?>
+
