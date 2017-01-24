@@ -6,3 +6,11 @@ sites/*/files
 sites/*/private
 sxd
 sites/all/themes/teploexpert/node_modules
+.htaccess
+includes
+modules
+themes
+robots.txt
+scripts
+misc
+profiles
