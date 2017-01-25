@@ -1,3 +1,4 @@
+/*! typey | GPLv2 License | https://github.com/jptaranto/typey */
 @font-face {
   font-family: 'archiveregular';
   src: url("../fonts/archive-webfont.eot");
@@ -2602,10 +2603,9 @@ aside .block-menu > .menu li:hover > ul {
 .block-facetapi.brand-filter .block__title,
 .block-ws-brand-block .block__title,
 .block.series .block__title {
-  font-size: 1rem;
+  font-size: 16px;
+  font-weight: bold;
   font-family: Arial, Helvetica, "Nimbus Sans L", sans-serif;
-  font-weight: normal;
-  font-style: italic;
   color: #939393;
   margin: 0;
 }
@@ -2636,6 +2636,8 @@ aside .block-menu > .menu li:hover > ul {
   font-weight: bold;
   color: #000;
   text-decoration: none;
+  display: inline-block;
+  margin-right: 20px;
 }
 
 .block-facetapi.brand-filter a:hover,
@@ -2700,6 +2702,20 @@ aside .block-menu > .menu li:hover > ul {
   top: 45%;
   margin-top: -4.5px;
   right: 0;
+}
+
+.tags-block {
+  color: #939393;
+}
+
+.tags-block p {
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.tags-block p a {
+  display: inline-block;
+  margin-right: 10px;
 }
 
 .main-info {
@@ -3015,7 +3031,7 @@ aside .block-menu > .menu li:hover > ul {
   width: 100%;
   overflow: hidden;
   text-align: center;
-  margin: 0 0 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -3304,5 +3320,3 @@ aside .block-menu > .menu li:hover > ul {
   border: 0;
   background: transparent;
 }
-
-/*# sourceMappingURL=styles.css.map */
