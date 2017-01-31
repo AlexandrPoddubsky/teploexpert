@@ -276,14 +276,18 @@ function lp_export_form_submit($form_id, &$form_state) {
                 $array_series[] = $series[$val['tid']];
               }
               $value = implode(', ', $array_series);
-              break;  
+              break;
             default:
               # code...
               break;
           }
         break;
         case 'image_image':
-          $value = empty($node->$field) ? null : $node->{$field}[LANGUAGE_NONE][0]['filename'];
+          $array_images = array();
+          foreach ($node->{$field}[LANGUAGE_NONE] as $val) {
+           $array_images[] = $val['filename'];
+          }
+          $value = empty($array_images) ? null : implode(', ', $array_images);
           break;
 
         default:
