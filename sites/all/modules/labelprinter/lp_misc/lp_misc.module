@@ -64,3 +64,12 @@ function lp_product_image($node, $style) {
   }
   return '<div class="product-picture">' . l($img, 'node/' . $node->nid, array('html' => true)) . '</div>';
 }
+
+/**
+ * Implements hook_field_display_ENTITY_TYPE_alter().
+ */
+function lp_misc_module_implements_alter (&$implementations, $hook) {
+  if ($hook == 'field_display_node_alter') {
+    unset($implementations['node']);
+  }
+}

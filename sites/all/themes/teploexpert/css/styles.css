@@ -2384,6 +2384,12 @@ aside .block-menu > .menu li:hover > ul {
   display: inline-block;
 }
 
+.view-product-index .views-row .field-label,
+.view-recommended .views-row .field-label {
+  font-weight: normal;
+  margin: 0;
+}
+
 .view-product-index .views-row .display-price,
 .view-recommended .views-row .display-price {
   float: none;
