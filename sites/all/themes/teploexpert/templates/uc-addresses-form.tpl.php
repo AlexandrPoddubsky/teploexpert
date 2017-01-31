@@ -13,11 +13,8 @@
  *
  * @ingroup themeable
  */
-$form['billing_last_name']['#title'] = 'ФИО';
 ?>
 <div class="address-pane-table">
-   <input type="radio" class="ownership" name="ownership" value="Физическое лицо" id="fizlico" checked="checked"><label class="option" for="fizlico">Физическое лицо</label>
-   <input type="radio" class="ownership" name="ownership" value="Юридическое лицо" id="yurlico"><label class="option" for="yurlico">Юридическое лицо</label>
   <table>
     <?php foreach (element_children($form) as $fieldname): ?>
       <?php
