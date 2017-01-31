@@ -2736,6 +2736,15 @@ aside .block-menu > .menu li:hover > ul {
   text-align: center;
 }
 
+.main-info .thumbs {
+  text-align: left;
+}
+
+.main-info .thumbs .field-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .main-info .info-pane h1 {
   line-height: 1.69231rem;
   margin-top: 0;

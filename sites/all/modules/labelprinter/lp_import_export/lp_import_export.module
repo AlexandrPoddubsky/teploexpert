@@ -139,17 +139,35 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           }
           break;
           case 'image_image':
-            if (empty($node->uc_product_image)) {
-              $oldfile = db_select('file_managed', 'f')
+          $images = explode(',', $value);
+          foreach ($images as $key => $image) {
+            $images[$key] = trim($image);
+          }
+          $newimages = FALSE;
+          if (isset($node->uc_product_image[LANGUAGE_NONE]) && is_array($node->uc_product_image[LANGUAGE_NONE])) {
+            if (count($node->uc_product_image[LANGUAGE_NONE]) < count($images)) {
+              $newimages = TRUE;
+              foreach ($images as $key => $image) {
+                if ($key < count($node->uc_product_image[LANGUAGE_NONE])) {
+                  unset($images[$key]);
+                } else {
+                  break;
+                }
+              }
+            }
+          }
+            if (empty($node->uc_product_image) || $newimages) {
+              foreach ($images as $key => $image) {
+                $oldfile = db_select('file_managed', 'f')
                 ->fields('f', array('fid'))
-                ->condition('f.filename', $value)
+                ->condition('f.filename', $image)
                 ->execute()
                 ->fetchField();
                 if (!empty($oldfile)) {
                   $file = file_load($oldfile);
                 } else {
 
-                $filepath = $folder . '/' . $value;
+                $filepath = $folder . '/' . $image;
                 if (file_exists($filepath)) {
                   $file = new stdClass;
                   $file->uid = $user->uid;
@@ -161,8 +179,10 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
                   file_unmanaged_delete($filepath);
                 }
               }
-              if (isset($file)) $node->uc_product_image[LANGUAGE_NONE][0] = (array) $file;
-              break;
+               if (isset($file)) $node->uc_product_image[LANGUAGE_NONE][] = (array) $file;
+            }
+
+              //break;
           }
             break;
           default:

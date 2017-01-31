@@ -10,6 +10,15 @@
     text-align: center;
   }
 
+  .thumbs {
+    text-align: left;
+
+    .field-item {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+
   .info-pane {
 
     h1 {
