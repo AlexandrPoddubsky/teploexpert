@@ -291,7 +291,7 @@ function lp_export_form_submit($form_id, &$form_state) {
           break;
 
         default:
-          # code...
+         $value = !empty($node->$field) ? $node->{$field}[LANGUAGE_NONE][0]['value'] : null;
           break;
       }
 

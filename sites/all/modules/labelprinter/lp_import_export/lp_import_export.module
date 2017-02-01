@@ -67,7 +67,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
     }
 
     foreach ($row as $field => $value) {
-      if(!empty($value)){
+      if(!empty($value) || $value == 0){
         switch ($fields[$field]['type']) {
           case 'meta':
             switch ($field) {
@@ -186,7 +186,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           }
             break;
           default:
-            # code...
+            $node->{$field}[LANGUAGE_NONE][0]['value'] = $value;
             break;
         }
       }
