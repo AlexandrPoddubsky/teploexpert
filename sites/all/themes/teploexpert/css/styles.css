@@ -2918,6 +2918,28 @@ aside .block-menu > .menu li:hover > ul {
   font-weight: bold;
 }
 
+.one-phone input {
+  float: right;
+}
+
+.oneclick {
+  color: #fff;
+  background: -webkit-linear-gradient(#ffcd60, #f6a621);
+  background: linear-gradient(#ffcd60, #f6a621);
+  border: 1px solid #f6a621;
+  border-radius: 5px;
+  border-bottom: 2px solid #cc6900;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 1px #cc6900;
+  padding: 3.5px 20px;
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+.buy-buttons > * {
+  display: inline-block;
+}
+
 .readmore {
   clear: both;
   margin-left: 270px;

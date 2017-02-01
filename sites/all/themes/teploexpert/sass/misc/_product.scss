@@ -203,3 +203,27 @@
     }
   }
 }
+
+.one-phone input {
+  float: right;
+}
+
+.oneclick {
+  color: #fff;
+  background: linear-gradient(#ffcd60, #f6a621);
+  border: 1px solid #f6a621;
+  border-radius: 5px;
+  border-bottom: 2px solid color('yellow')-#333;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 1px color('yellow')-#333;
+  padding: 3.5px 20px;
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+.buy-buttons {
+
+  > * {
+    display: inline-block;
+  }
+}

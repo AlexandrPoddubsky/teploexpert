@@ -36,9 +36,12 @@
           <em>Способы оплаты:</em>
           <div><img src="/sites/all/themes/teploexpert/images/img-payment.jpg"></div>
         </div>
+      <div class="buy-buttons">
       <?php
         print render($content['add_to_cart']);
       ?>
+      <a href="/oneclick" class="colorbox-node oneclick">Купить в один клик</a>
+      </div>
       </div>
       <div class="box2">
                 <ul class="tools">
