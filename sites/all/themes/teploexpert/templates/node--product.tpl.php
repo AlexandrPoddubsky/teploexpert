@@ -40,7 +40,7 @@
       <?php
         print render($content['add_to_cart']);
       ?>
-      <a href="/oneclick" class="colorbox-node oneclick">Купить в один клик</a>
+      <a href="/oneclick?prod=<?php print $node->nid; ?>" class="colorbox-node oneclick">Купить в один клик</a>
       </div>
       </div>
       <div class="box2">
