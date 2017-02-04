@@ -284,6 +284,10 @@ function lp_export_form_submit($form_id, &$form_state) {
         break;
         case 'image_image':
           $array_images = array();
+          if (!is_array($node->$field)) {
+            $value = null;
+            break;
+          }
           foreach ($node->{$field}[LANGUAGE_NONE] as $val) {
            $array_images[] = $val['filename'];
           }
