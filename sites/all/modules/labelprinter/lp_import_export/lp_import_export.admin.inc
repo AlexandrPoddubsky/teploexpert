@@ -284,7 +284,7 @@ function lp_export_form_submit($form_id, &$form_state) {
         break;
         case 'image_image':
           $array_images = array();
-          if (!is_array($node->{$field}[LANGUAGE_NONE])) {
+          if (!is_array($node->{$field}) || !is_array($node->{$field}[LANGUAGE_NONE])) {
             $value = null;
             break;
           }
