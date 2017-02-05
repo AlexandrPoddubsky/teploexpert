@@ -2918,6 +2918,51 @@ aside .block-menu > .menu li:hover > ul {
   font-weight: bold;
 }
 
+.chapter.refs .view-recommended {
+  padding: 0 10px;
+  height: auto;
+}
+
+.chapter.refs .view-recommended .view-content {
+  padding: 15px 0;
+  display: -webkit-box;
+  display: flex;
+}
+
+.chapter.refs .field-label {
+  color: #000;
+  text-transform: uppercase;
+  font-family: Tahoma, Verdana, "DejaVu Sans", sans-serif;
+  font-size: 1.53846rem;
+  font-weight: normal;
+}
+
+.chapter.refs .views-row {
+  min-width: 137px;
+  margin: 0;
+  border: 0;
+  padding: 10px;
+  min-height: inherit;
+}
+
+.chapter.refs .views-row .views-field-uc-product-image {
+  width: auto;
+  height: auto;
+}
+
+.chapter.refs .views-row img {
+  max-width: 100%;
+  height: auto;
+}
+
+.chapter.refs .views-row:hover {
+  box-shadow: 0 0 5px;
+}
+
+.chapter.refs .views-row .views-field-title {
+  height: auto;
+}
+
 .one-phone input {
   float: right;
 }
@@ -3357,3 +3402,5 @@ aside .block-menu > .menu li:hover > ul {
   border: 0;
   background: transparent;
 }
+
+/*# sourceMappingURL=styles.css.map */

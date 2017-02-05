@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the ws_feature_refs feature.
+ */
+
+include_once 'ws_feature_refs.features.inc';

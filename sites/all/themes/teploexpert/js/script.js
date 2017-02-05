@@ -85,10 +85,12 @@
       });
       // slider controls
       $('.tz_next').click(function () {
-        $('.view-recommended .view-content .views-row:first').appendTo('.view-recommended .view-content');
+
+       $(this).parent().prev().children('.views-row:first').appendTo($(this).parent().prev());
        })
     $('.tz_prev').click(function () {
-        $('.view-recommended .view-content .views-row:last').prependTo('.view-recommended .view-content');
+
+       $(this).parent().next().children('.views-row:last').prependTo($(this).parent().next());
        })
     $('#ajaxCartUpdate').ajaxComplete(function (event, request, settings) {
       if (request.responseURL.indexOf('uc_ajax_cart/show') >= 0) {

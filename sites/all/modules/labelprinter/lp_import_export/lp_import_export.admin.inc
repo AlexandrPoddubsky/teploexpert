@@ -181,31 +181,6 @@ function lp_export_form_submit($form_id, &$form_state) {
   }
 
   $related_fields = lp_import_export_get_related_fields();
-  $nids = array();
-  foreach ($nodes as $key => $node) {
-    foreach ($related_fields as $field) {
-      $node_related_nids = array();
-      if (!empty($node->{$field})) {
-        foreach ($node->{$field}[LANGUAGE_NONE] as $item) {
-          $nids[] = $item['nid'];
-          $node_related_nids[] = $item['nid'];
-        }
-      }
-      $nodes[$key]->{$field} = $node_related_nids;
-    }
-  }
-  $models = array();
-  if(!empty($nids)){
-  $nids = array_unique($nids);
-  $result = db_select('uc_products', 'p')
-    ->fields('p', array('nid', 'model'))
-    ->condition('p.nid', $nids, 'IN')
-    ->execute()->fetchAll();
-
-  foreach ($result as $row) {
-    $models[$row->nid] = $row->model;
-	}
-  }
 
   $i = 2;
   foreach ($nodes as $node) {
@@ -295,6 +270,30 @@ function lp_export_form_submit($form_id, &$form_state) {
           break;
 
         default:
+        if (in_array($field, $related_fields)) {
+        $nids = array();
+        $value = '';
+              if (!empty($node->{$field})) {
+                foreach ($node->{$field}[LANGUAGE_NONE] as $item) {
+                  $nids[] = $item['target_id'];
+                }
+              }
+
+          $models = array();
+          if(!empty($nids)){
+          $nids = array_unique($nids);
+          $result = db_select('uc_products', 'p')
+            ->fields('p', array('nid', 'model'))
+            ->condition('p.nid', $nids, 'IN')
+            ->execute()->fetchAll();
+
+          foreach ($result as $row) {
+            $models[$row->nid] = $row->model;
+            }
+            $value = empty($models) ? '' : implode(', ', $models);
+          }
+          break;
+        }
          $value = !empty($node->$field) ? $node->{$field}[LANGUAGE_NONE][0]['value'] : null;
           break;
       }
@@ -356,9 +355,5 @@ function lp_import_export_get_fields($type) {
       );
   }
   return $fields;
-}
-
-function lp_import_export_get_related_fields() {
-  return array('field_recommended', 'field_similar', 'field_accessories');
 }
 

@@ -65,6 +65,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
       $node = node_load($product->nid);
       $new = false;
     }
+    $related_fields = lp_import_export_get_related_fields();
 
     foreach ($row as $field => $value) {
       if(!empty($value) || $value == 0){
@@ -97,7 +98,7 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           case 'number':
           $val_array = explode(';', $value);
           foreach ($val_array as $key => $val) {
-            $node->{$field}[LANGUAGE_NONE][$key]['value'] = trim($val);
+            $node->{$field}[LANGUAGE_NONE][$key]['value'] = empty(trim($val)) ? null : trim($val);
           }
           break;
           case 'taxonomy_autocomplete' :
@@ -181,12 +182,36 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
               }
                if (isset($file)) $node->uc_product_image[LANGUAGE_NONE][] = (array) $file;
             }
-
-              //break;
           }
             break;
           default:
-            $node->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+          if (in_array($field, $related_fields)) {
+                $node_models = explode(',', $value);
+                if (empty($node_models)) {
+                    continue;
+                }
+                $models = array();
+                foreach ($node_models as $node_model) {
+                  $models[] = trim($node_model);
+                }
+                if (!empty($models)) {
+                    $models = array_unique($models);
+                  $query = db_select('uc_products', 'p')
+                    ->fields('p', array('model', 'nid'))
+                    ->condition('p.model', $models, 'IN')
+                    ->execute();
+                    $result = $query->fetchAllKeyed();
+                  $vals = array();
+                  foreach ($result as $nid) {
+                    $vals[]['target_id'] = $nid;
+                  }
+                  $node->{$field}[LANGUAGE_NONE] = $vals;
+                }
+
+
+            break;
+          }
+            $node->{$field}[LANGUAGE_NONE][0]['value'] = empty($value) ? null : $value;
             break;
         }
       }
@@ -218,46 +243,8 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
       $context['results']['updated']++;
     }
 
-    /*foreach ($related_fields as $field) {
-      $row[$field] = trim($row[$field]);
-      if (!empty($row[$field])) {
-        $node_models = preg_split('/\s*,\s*//*', $row[$field], -1, PREG_SPLIT_NO_EMPTY);
-        if (empty($node_models)) {
-            continue;
-        }
-        $models = array_merge($models, $node_models);
-        $product_related_models[$node->nid][$field] = $node_models;
-      }
-    }*/
   }
 
-  if(!empty($models)){$models = array_unique($models);
-  //$nids = array_unique($nids);
-  $result = db_select('uc_products', 'p')
-    ->fields('p', array('nid', 'model'))
-    ->condition('p.model', $models, 'IN')
-    ->execute()->fetchAll();
-  $nids = array();
-  foreach ($result as $row) {
-    $nids[$row->model] = $row->nid;
-  }
-  foreach ($product_related_models as $nid => $node_models) {
-    $node = node_load($nid);
-    foreach ($related_fields as $field) {
-      $values = array();
-    if (isset($node_models[$field])) {
-      foreach ($node_models[$field] as $model) {
-      if (isset($nids[$model])) {
-        $values[] = array('nid' => $nids[$model]);
-      }
-      }
-      $node->{$field}[LANGUAGE_NONE] = $values;
-    }
-
-    }
-    node_save($node);
-  }
-}
 
 function lp_import_export_process_import_finished ($success, $results, $operations) {
 
@@ -277,3 +264,9 @@ function lp_import_export_process_import_finished ($success, $results, $operatio
     )), 'warning');
   }
 }
+
+
+function lp_import_export_get_related_fields() {
+  return array('field_recommended', 'field_complect', 'field_accessories');
+}
+

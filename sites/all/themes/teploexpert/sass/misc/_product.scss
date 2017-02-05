@@ -202,6 +202,53 @@
       font-weight: bold;
     }
   }
+
+  &.refs {
+
+    .view-recommended {
+      padding: 0 10px;
+      height: auto;
+
+      .view-content {
+        padding: 15px 0;
+        display: flex;
+      }
+    }
+
+    .field-label {
+      color: #000;
+      text-transform: uppercase;
+      font-family: $tahoma;
+      font-size: font-size('l');
+      font-weight: normal;
+    }
+
+    .views-row {
+      min-width: 137px;
+      margin: 0;
+      border: 0;
+      padding: 10px;
+      min-height: inherit;
+
+      .views-field-uc-product-image {
+        width: auto;
+        height: auto;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      &:hover {
+        box-shadow: 0 0 5px;
+      }
+
+      .views-field-title {
+        height: auto;
+      }
+    }
+  }
 }
 
 .one-phone input {

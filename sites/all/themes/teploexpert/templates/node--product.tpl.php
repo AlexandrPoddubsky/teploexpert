@@ -28,7 +28,7 @@
       <?php
         print render($content['field_sku']);
         ?>
-        <div class="fast-links"><a href="#features">Характеристики</a>&nbsp;&nbsp;<a href="#descr">Описание</a></div>
+        <div class="fast-links"><a href="#features">Характеристики</a>&nbsp;&nbsp;<a href="#descr">Описание</a>&nbsp;&nbsp;<a href="#recommended">Сопутствующие товары</a></div>
         <?php
         print render($content['display_price']);
         ?>
@@ -88,6 +88,7 @@ charset="utf-8"></script>
     hide($content['links']);
     hide($content['body']);
     hide($content['field_tags']);
+    hide($content['field_recommended']);
     ?>
     <div class="chapter specs">
     <div class="chapter-title" id="features">Характеристики</div>
@@ -113,4 +114,13 @@ charset="utf-8"></script>
   ?>
   </div></div>
 <?php endif; ?>
+<div class="chapter refs" id="recommended">
+    <?php print render($content['field_recommended']); ?>
+    <?php print render($content['field_accessories']); ?>
+    <?php print render($content['field_complect']); ?>
+    <div class="field-label">Другие товары раздела</div>
+    <?php print views_embed_view('recommended', 'block_2'); ?>
+    <div class="field-label">Популярные товары категории</div>
+    <?php print views_embed_view('recommended', 'block_3'); ?>
+  </div>
 </article>
