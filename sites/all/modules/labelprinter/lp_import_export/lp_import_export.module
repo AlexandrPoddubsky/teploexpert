@@ -98,7 +98,8 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
           case 'number':
           $val_array = explode(';', $value);
           foreach ($val_array as $key => $val) {
-            $node->{$field}[LANGUAGE_NONE][$key]['value'] = empty(trim($val)) ? null : trim($val);
+            $val = trim($val);
+            $node->{$field}[LANGUAGE_NONE][$key]['value'] = empty($val) ? null : $val;
           }
           break;
           case 'taxonomy_autocomplete' :
