@@ -116,12 +116,14 @@ charset="utf-8"></script>
   ?>
   </div></div>
   <?php endif; ?>
-  <div class="chapter">
-    <?php
+  <?php
     $blocks = block_get_blocks_by_region('bottom');
     if (isset($blocks['#sorted'])) unset($blocks['#sorted']);
     if (isset($blocks['block_5'])) unset($blocks['block_5']);
+    if (!empty($blocks)) :
    ?>
+  <div class="chapter">
+
     <div class="chapter-title" >Метки раздела</div>
     <div class="fields">
       <?php
@@ -132,6 +134,7 @@ charset="utf-8"></script>
     </div>
 
   </div>
+<?php endif; ?>
 
 <div class="chapter refs" id="recommended">
     <?php print render($content['field_recommended']); ?>
