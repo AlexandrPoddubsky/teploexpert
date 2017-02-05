@@ -89,6 +89,8 @@ charset="utf-8"></script>
     hide($content['body']);
     hide($content['field_tags']);
     hide($content['field_recommended']);
+    hide($content['field_complect']);
+    hide($content['field_accessories']);
     ?>
     <div class="chapter specs">
     <div class="chapter-title" id="features">Характеристики</div>
@@ -113,7 +115,24 @@ charset="utf-8"></script>
     print render($content['field_tags']);
   ?>
   </div></div>
-<?php endif; ?>
+  <?php endif; ?>
+  <div class="chapter">
+    <?php
+    $blocks = block_get_blocks_by_region('bottom');
+    if (isset($blocks['#sorted'])) unset($blocks['#sorted']);
+    if (isset($blocks['block_5'])) unset($blocks['block_5']);
+   ?>
+    <div class="chapter-title" >Метки раздела</div>
+    <div class="fields">
+      <?php
+        foreach ($blocks as $block) {
+          print $block['#markup'];
+        }
+      ?>
+    </div>
+
+  </div>
+
 <div class="chapter refs" id="recommended">
     <?php print render($content['field_recommended']); ?>
     <?php print render($content['field_accessories']); ?>

@@ -2963,6 +2963,12 @@ aside .block-menu > .menu li:hover > ul {
   height: auto;
 }
 
+.chapter.tags .field-items {
+  -webkit-column-count: 2;
+     -moz-column-count: 2;
+          column-count: 2;
+}
+
 .one-phone input {
   float: right;
 }

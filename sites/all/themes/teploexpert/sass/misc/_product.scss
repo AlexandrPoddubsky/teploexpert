@@ -249,6 +249,13 @@
       }
     }
   }
+
+  &.tags {
+
+    .field-items {
+      column-count: 2;
+    }
+  }
 }
 
 .one-phone input {
