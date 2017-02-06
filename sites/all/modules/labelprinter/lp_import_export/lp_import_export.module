@@ -88,6 +88,8 @@ function lp_import_export_process_import ($row, $fields, $categories, $tags, $ve
             if ($field != 'type') $node->$field = $value;
             break;
           case 'text_textarea_with_summary':
+          case 'text_textarea':
+          if(trim($value) == '') break;
             $node->{$field}[LANGUAGE_NONE][0] = array(
               'value' => $value,
               'format' => 'full_html',

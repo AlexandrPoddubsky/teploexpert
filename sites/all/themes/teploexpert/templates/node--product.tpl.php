@@ -29,6 +29,9 @@
         print render($content['field_sku']);
         ?>
         <div class="fast-links"><a href="#features">Характеристики</a>&nbsp;&nbsp;<a href="#descr">Описание</a>&nbsp;&nbsp;<a href="#recommended">Сопутствующие товары</a></div>
+        <?php if (isset($node->field_availability['und'][0]['value']) && $node->field_availability['und'][0]['value'] == 'в наличии') : ?>
+          <div class="availability">Товар имеется в наличии</div>
+        <?php endif; ?>
         <?php
         print render($content['display_price']);
         ?>
@@ -42,6 +45,7 @@
       ?>
       <a href="/oneclick?prod=<?php print $node->nid; ?>" class="colorbox-node oneclick">Купить в один клик</a>
       </div>
+      <?php print render($content['compare']); ?>
       </div>
       <div class="box2">
                 <ul class="tools">
@@ -54,14 +58,11 @@
                             <p>Наши водители не являются грузчиками, они будут рады вам помочь, если вы их попросите, но повторяем, что это в их обязанности не входит :)<br/>??нтервалы: 10.00-.20-00 – дневной интервал; 16.00-22.00 – вечерний интервал.  (Просим вас понять нас в случаях, когда наши шоферы задерживаются, пробки в Москве. </p>
                         </div>
                     </li>
+                    <?php if (isset($content['field_mount'])) : ?>
                     <li class="montaz">
-                        <span class="strong link">с монтажом</span>
-                        <p>С монтажом дешевле</p>
-                        <div class="tools-drop">
-                            <span class="corner"></span>
-                            <p>Многолетний опыт компании позволяет проводить различные электромонтажные работы в частных и загородных домах. Как правило, речь идет о подключении дома к электромагистрали («ввод в дом»), а также о внутренних электротехнических работах в кирпичных, деревянных, панельных домах (монтаж электропроводки в новом доме, замена «старой проводки», увеличение мощности энергопотребления). </p>
-                        </div>
+                        <?php print render($content['field_mount']); ?>
                     </li>
+                  <?php endif; ?>
                     <li class="order">
                         <span class="strong link">Заказ по телефону</span>
                         <p><span class="strong tel">+7 (495) 649-61-65</span></p>
@@ -79,6 +80,10 @@ charset="utf-8"></script>
 <div class="yashare-auto-init" data-yashareL10n="ru" data-yashareType="button" data-yashareQuickServices="yaru,vkontakte,facebook,twitter,odnoklassniki"></div>
                 </div>
             </div> <!---end of box2 -->
+    </div>
+    <div class="sale-info">
+      <?php print render($content['field_sale_info']); ?>
+      <?php print render($content['field_sale_info_add']); ?>
     </div>
   </div>
 
@@ -109,7 +114,7 @@ charset="utf-8"></script>
   </div></div>
   <?php if (count($content['field_tags']) > 1): ?>
   <div class="chapter tags">
-    <div class="chapter-title" id="tags">Метки</div>
+    <div class="chapter-title" id="tags">Смотрите также</div>
     <div class="fields">
     <?php $content['field_tags']['#label_display'] = 'hidden';
     print render($content['field_tags']);

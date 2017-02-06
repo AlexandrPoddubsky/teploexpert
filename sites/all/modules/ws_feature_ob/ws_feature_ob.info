@@ -1,0 +1,13 @@
+name = ws_feature_ob
+core = 7.x
+package = Features
+version = 7.x-1.0
+dependencies[] = features
+dependencies[] = text
+features[features_api][] = api:2
+features[field_base][] = field_mount
+features[field_base][] = field_sale_info
+features[field_base][] = field_sale_info_add
+features[field_instance][] = node-hand_dryers-field_mount
+features[field_instance][] = node-hand_dryers-field_sale_info
+features[field_instance][] = node-hand_dryers-field_sale_info_add

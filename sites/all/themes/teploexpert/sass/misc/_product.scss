@@ -8,14 +8,24 @@
     margin-right: 30px;
     width: 300px;
     text-align: center;
+
+    .main-image {
+      border: 1px solid #e3e3e3;
+    }
+
   }
 
   .thumbs {
     text-align: left;
+    margin-top: 10px;
 
     .field-item {
       display: inline-block;
       margin-right: 10px;
+
+      img {
+        border: 1px solid #e3e3e3;
+      }
     }
   }
 
@@ -100,7 +110,8 @@
         padding-left: 50px;
         position: relative;
 
-        .strong {
+        .strong,
+        strong {
           color: color('yellow');
           text-transform: uppercase;
           border-bottom: 1px dashed color('yellow');
@@ -280,4 +291,60 @@
   > * {
     display: inline-block;
   }
+}
+
+.sale-info {
+  clear: left;
+  width: 300px;
+  line-height: 1.2em;
+  margin-bottom: 10px;
+
+  .field-name-field-sale-info {
+    background-color: #22c1f0;
+    color: #fff;
+    padding: 15px 20px;
+
+    p {
+      margin: 0;
+    }
+
+    strong {
+      text-transform: uppercase;
+      font-size: 22px;
+      display: block;
+      margin-bottom: 10px;
+    }
+  }
+
+  .field-name-field-sale-info-add {
+    color: color('yellow');
+    padding: 10px 0 10px 40px;
+    background: url('../images/calendar.png') 0 0 no-repeat;
+    font-weight: bold;
+    margin-top: 10px;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.compare-product {
+
+  input {
+    display: none;
+  }
+
+  label,
+  a {
+    cursor: pointer;
+    color: color('blue');
+    text-decoration: underline;
+    font-weight: normal;
+  }
+}
+
+.availability {
+  color: color('yellow');
+  font-weight: bold;
 }

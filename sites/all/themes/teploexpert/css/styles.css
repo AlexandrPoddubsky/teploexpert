@@ -2667,9 +2667,19 @@ aside .block-menu > .menu li:hover > ul {
   color: #000;
 }
 
+.view-subcategories .view-content {
+  overflow: hidden;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
 .view-subcategories .views-row {
   width: 50%;
   float: left;
+}
+
+.view-subcategories .views-row:nth-child(2n-1) {
+  padding-right: 20px;
 }
 
 .view-subcategories .views-row a {
@@ -2736,13 +2746,22 @@ aside .block-menu > .menu li:hover > ul {
   text-align: center;
 }
 
+.main-info .field-name-uc-product-image .main-image {
+  border: 1px solid #e3e3e3;
+}
+
 .main-info .thumbs {
   text-align: left;
+  margin-top: 10px;
 }
 
 .main-info .thumbs .field-item {
   display: inline-block;
   margin-right: 10px;
+}
+
+.main-info .thumbs .field-item img {
+  border: 1px solid #e3e3e3;
 }
 
 .main-info .info-pane h1 {
@@ -2823,14 +2842,16 @@ aside .block-menu > .menu li:hover > ul {
   position: relative;
 }
 
-.main-info .info-pane .box2 li .strong {
+.main-info .info-pane .box2 li .strong,
+.main-info .info-pane .box2 li strong {
   color: #ff9c00;
   text-transform: uppercase;
   border-bottom: 1px dashed #ff9c00;
   font-weight: bold;
 }
 
-.main-info .info-pane .box2 li .strong.tel {
+.main-info .info-pane .box2 li .strong.tel,
+.main-info .info-pane .box2 li strong.tel {
   color: #22c1f0;
   border-bottom: 0;
 }
@@ -2989,6 +3010,59 @@ aside .block-menu > .menu li:hover > ul {
 
 .buy-buttons > * {
   display: inline-block;
+}
+
+.sale-info {
+  clear: left;
+  width: 300px;
+  line-height: 1.2em;
+  margin-bottom: 10px;
+}
+
+.sale-info .field-name-field-sale-info {
+  background-color: #22c1f0;
+  color: #fff;
+  padding: 15px 20px;
+}
+
+.sale-info .field-name-field-sale-info p {
+  margin: 0;
+}
+
+.sale-info .field-name-field-sale-info strong {
+  text-transform: uppercase;
+  font-size: 22px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.sale-info .field-name-field-sale-info-add {
+  color: #ff9c00;
+  padding: 10px 0 10px 40px;
+  background: url("../images/calendar.png") 0 0 no-repeat;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.sale-info .field-name-field-sale-info-add p {
+  margin: 0;
+}
+
+.compare-product input {
+  display: none;
+}
+
+.compare-product label,
+.compare-product a {
+  cursor: pointer;
+  color: #22c1f0;
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+.availability {
+  color: #ff9c00;
+  font-weight: bold;
 }
 
 .readmore {
