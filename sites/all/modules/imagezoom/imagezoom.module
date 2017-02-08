@@ -95,9 +95,11 @@ function imagezoom_field_formatter_settings_summary($field, $instance, $view_mod
   $summary = array();
 
   $zoom_types = imagezoom_zoom_types();
+  if ($settings['imagezoom_zoom_type'] != '') {
   $summary[] = t('Zoom type: @type', array(
     '@type' => $zoom_types[$settings['imagezoom_zoom_type']],
   ));
+}
 
   $image_styles = image_style_options(FALSE);
   // Unset possible 'No defined styles' option.
